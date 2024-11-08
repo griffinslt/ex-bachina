@@ -10,8 +10,7 @@
   <br><br><br>
   <div class="text-center">
     <br><br>
-    <div ref="paper" id="target"></div>
-    <button @click="showScore(string)" class="btn btn-primary">Load Score</button>
+    <div id="target"></div>
   </div>
 
 </template>
@@ -20,7 +19,8 @@
 import getXMLAsString from '@/composables/getXMLAsString';
 import xmlToAbc from '@/composables/xmlToAbc';
 import { renderAbc } from 'abcjs';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import Chorale from '@/classes/Chorale'
 
 
 export default {
@@ -28,25 +28,40 @@ export default {
   setup() {
 
     const errors = ref([])
-    const { string, error, load } = getXMLAsString('/helloworld.xml')   
+    const { string, error, load } = getXMLAsString('/scores/BWV_0253.xml')   
     load()
     if (error.value) {
       errors.value.push(error)
     }
 
-    const showScore = (xml) => {
+    const showScore = () => {
       const { text, error, convert } = xmlToAbc(string.value)
       convert()
       if (error.value) {
         errors.value.push(error.value)
       }
-      console.log(text.value, error.value)
       renderAbc("target", text.value);
-      console.log("ran code")
-
     }
 
-    return { showScore, string, errors }
+    
+    
+    const scoreAsObject = () => {
+      const xmlDoc = new DOMParser().parseFromString(string.value, "text/xml")
+      var c = new Chorale(xmlDoc)
+      c.test()
+    } 
+    
+    
+    // waits until the file is read
+    watch(string, () => {
+      showScore()
+      scoreAsObject()
+    
+    })
+
+
+
+    return { errors }
   }
 
 }
