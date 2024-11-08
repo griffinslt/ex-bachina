@@ -12,7 +12,6 @@ const getXMLAsString = (path) => {
             string.value = await data.text()
         } catch (err) {
             error.value = error.message
-            console.log(error.value)
         }
     }
     return { string, error, load }

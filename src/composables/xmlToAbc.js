@@ -2,7 +2,6 @@ import { ref } from 'vue'
 import { vertaal } from 'xml2abc'
 
 const xmlToAbc = (xmlString) => {
-    console.log(xmlString)
     const error = ref(null)
     const text = ref("")
     var options = {
