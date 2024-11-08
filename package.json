@@ -10,10 +10,13 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
+    "abcjs": "^6.4.4",
     "bootstrap": "^5.3.3",
+    "jquery": "^3.7.1",
     "music21j": "^0.16.5",
     "vue": "^3.5.12",
-    "vue-router": "^4.4.5"
+    "vue-router": "^4.4.5",
+    "xml2abc": "https://wim.vree.org/js/xml2abc.tgz"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.1.4",
