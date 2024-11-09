@@ -7,7 +7,6 @@
   <div class="text-center bg-light border rounded p-5">
     <h1>Bachian Harmony for Teaching Computing in the Classroom</h1>
   </div>
-  <br><br><br>
   <div class="text-center">
     <br><br>
     <div id="target"></div>
@@ -28,7 +27,7 @@ export default {
   setup() {
 
     const errors = ref([])
-    const { string, error, load } = getXMLAsString('/scores/BWV_0253.xml')   
+    const { string, error, load } = getXMLAsString('/scores/BWV_0254.xml')   
     load()
     if (error.value) {
       errors.value.push(error)
@@ -48,14 +47,13 @@ export default {
     const scoreAsObject = () => {
       const xmlDoc = new DOMParser().parseFromString(string.value, "text/xml")
       var c = new Chorale(xmlDoc)
-      c.test()
     } 
     
     
     // waits until the file is read
     watch(string, () => {
-      showScore()
       scoreAsObject()
+      showScore()
     
     })
 
