@@ -28,13 +28,14 @@ export default {
 
     const errors = ref([])
     const { string, error, load } = getXMLAsString('/scores/BWV_0254.xml')   
+    const xmlString = ref(string.value)
     load()
     if (error.value) {
       errors.value.push(error)
     }
 
     const showScore = () => {
-      const { text, error, convert } = xmlToAbc(string.value)
+      const { text, error, convert } = xmlToAbc(xmlString.value)
       convert()
       if (error.value) {
         errors.value.push(error.value)
@@ -47,6 +48,8 @@ export default {
     const scoreAsObject = () => {
       const xmlDoc = new DOMParser().parseFromString(string.value, "text/xml")
       var c = new Chorale(xmlDoc)
+      xmlString.value = c.getChoraleAsString()
+
     } 
     
     
