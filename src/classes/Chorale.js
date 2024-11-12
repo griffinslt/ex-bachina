@@ -59,10 +59,10 @@ export default class Chorale {
         // remove non-essential elements from music xml
 
         const essentialElements = [
-            "score-partwise", "work", "work-title", "part-list", "score-part", "part-name",
-            "part", 'measure', "attributes", "divisions", "key", "fifths", "mode", "time", "fermata", "notations",
-            "beats", "beat-type", "clef", "sign", "line", "note", "pitch", "step", "octave",
-            "duration", "type", "direction", "direction-type", "metronome", "beat-unit", "per-minute"
+            "score-partwise", "work", "work-title", "part-list", "score-part", "part-name", "part",
+            'measure', "attributes", "divisions", "key", "fifths", "mode", "time", "fermata", "notations",
+            "beats", "beat-type", "clef", "sign", "line", "note", "pitch", "step", "octave", "duration",
+            "type", "direction", "direction-type", "metronome", "beat-unit", "per-minute", "barline"
         ]
 
         const allElements = Array.from(this.xmlDoc.getElementsByTagName("*"))
