@@ -1,4 +1,4 @@
-import Voice from "./Voice"
+import Part from "./Part"
 
 export default class Chorale {
     constructor(xmlDoc) {
@@ -12,10 +12,10 @@ export default class Chorale {
         this.findKey()
 
         this.voices = [
-            new Voice("S"),
-            new Voice("A"),
-            new Voice("T"),
-            new Voice("B"),
+            new Part("S"),
+            new Part("A"),
+            new Part("T"),
+            new Part("B"),
         ]
 
 

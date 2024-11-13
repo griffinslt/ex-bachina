@@ -1,4 +1,4 @@
-export default class Voice {
+export default class Part {
     constructor(name, chorale) {
         this.name = name
         this.chorale = chorale
