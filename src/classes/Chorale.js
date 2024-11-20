@@ -1,3 +1,4 @@
+import { MusicXML } from "@stringsync/musicxml"
 import Part from "./Part"
 
 export default class Chorale {
@@ -22,9 +23,11 @@ export default class Chorale {
 
         this.timeSignature = { numerator: 4, denominator: 4 }
         this.startingKeySignature = ""
+
+        this.musicXmlObj = MusicXML.parse(new XMLSerializer().serializeToString(this.xmlDoc.documentElement));
     }
     getChoraleAsString() {
-        return new XMLSerializer().serializeToString(this.xmlDoc.documentElement);
+        return this.musicXmlObj.serialize()
     }
 
     getCadenceLocations() {
@@ -148,8 +151,7 @@ export default class Chorale {
         this.addNewPart("P3", "Tenor")
         this.addNewPart("P4", "Bass")
         const partList = this.xmlDoc.getElementsByTagName("part-list")[0]
-        // console.log(this.xmlDoc)
-
+        console.log(this.xmlDoc)
 
 
     }
