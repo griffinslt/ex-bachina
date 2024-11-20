@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
+    "@stringsync/musicxml": "^0.2.1",
     "abcjs": "^6.4.4",
     "bootstrap": "^5.3.3",
     "jquery": "^3.7.1",
