@@ -1,4 +1,4 @@
-import { MusicXML } from "@stringsync/musicxml"
+import { elements, MusicXML, asserts } from "@stringsync/musicxml"
 import Part from "./Part"
 
 export default class Chorale {
@@ -12,19 +12,22 @@ export default class Chorale {
         this.addNewParts()
         this.findKey()
 
+
+        
         this.voices = [
             new Part("S"),
             new Part("A"),
             new Part("T"),
             new Part("B"),
         ]
-
-
-
+        
+        
+        
         this.timeSignature = { numerator: 4, denominator: 4 }
         this.startingKeySignature = ""
-
+        
         this.musicXmlObj = MusicXML.parse(new XMLSerializer().serializeToString(this.xmlDoc.documentElement));
+        this.chooseCadences()
     }
     getChoraleAsString() {
         return this.musicXmlObj.serialize()
@@ -45,7 +48,7 @@ export default class Chorale {
         allFermatas.forEach(fermata => {
             const note = fermata.parentElement.parentElement
             const bar = note.parentElement
-            const barNumber = bar.getAttribute('number')
+            const barNumber = parseInt(bar.getAttribute('number'))
             const noteNumber = Array.prototype.indexOf.call(bar.getElementsByTagName("note"), note);
             locations.push({
                 barNumber: barNumber,
@@ -214,6 +217,42 @@ export default class Chorale {
         }
 
     }
+
+
+    chooseCadences(){
+        // for each fermata location select chords
+        //get part
+        const part1 = this.musicXmlObj.getRoot().getParts()[0]
+        const part1Bars = part1.getMeasures()
+        // console.log(part1Bars)
+
+
+        // console.log(this.cadenceLocations)
+        this.cadenceLocations.forEach(cadenceLocation => {
+            const cadenceBar = part1Bars[cadenceLocation.barNumber]
+            const barContents = cadenceBar.contents[0]
+            const notes = this.notesFromBar(barContents)
+            const cadenceNote = notes[cadenceLocation.noteNumber-1]
+
+            //find out what note it is in relation to our key
+            console.log(cadenceNote)
+            Chord
+
+        });
+    }
+
+    notesFromBar(bar){
+        var notes =[]
+        bar.forEach(element => {
+            if (asserts.isNote(element)) {
+                notes.push(element)
+            }
+        });
+
+        return notes
+    }
+
+
 
       
       
