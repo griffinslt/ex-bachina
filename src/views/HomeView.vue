@@ -27,7 +27,7 @@ export default {
   setup() {
 
     const errors = ref([])
-    const { string, error, load } = getXMLAsString('/scores/BWV_0254.xml')   
+    const { string, error, load } = getXMLAsString('/scores/BWV_0253.xml')   
     const xmlString = ref(string.value)
     load()
     if (error.value) {

@@ -55,54 +55,6 @@ export default class Chorale {
         this.cadenceLocations = locations
     }
 
-    findKey() {
-        const keyElements = this.xmlDoc.getElementsByTagName("key")
-        var mode = null
-        var fifths = null
-        if (keyElements.length == 1) {
-            fifths = parseInt(keyElements[0].getElementsByTagName("fifths")[0].innerHTML)
-            mode = keyElements[0].getElementsByTagName("mode")[0]
-            // console.log(fifths, mode)
-        } else {
-            console.log("Multiple keys")
-        }
-        if (typeof mode == 'undefined') {
-            mode = "major" // This might be a bad idea - may need to check for accidentals
-        }
-        this.startingKeySignature = this.fifthsToKey(fifths, mode)
-        console.log(this.startingKeySignature)
-
-
-
-    }
-
-    fifthsToKey(fifths, mode) {
-        const majorKeys = [
-            'Cb', 'Gb', 'Db', 'Ab','Eb','Bb','F','C',
-            'G', 'D', 'A', 'E', 'B', 'F#', 'C#',
-        ];
-        const minorKeys = [
-            'Ab', 'Eb','Bb', 'F', 'C', 'G', 'D', 'A',
-            'E', 'B', 'F#', 'C#', 'G#', "D#", "A#"
-        ];
-        
-        const index = fifths + 7
-
-        if (mode == "major") {
-            return majorKeys[index] + " " + mode
-        } else if (mode == "minor") {
-            return minorKeys[index] + " " + mode 
-        } else{
-            throw new Error("Unknown Mode");
-            
-        }
-
-        console.log(index)
-
-    }
-
-      
-      
 
     removeHarmony() {
         // remove all voices that are not <voice>1</voice>
@@ -122,7 +74,8 @@ export default class Chorale {
             "score-partwise", "work", "work-title", "part-list", "score-part", "part-name", "part",
             'measure', "attributes", "divisions", "key", "fifths", "mode", "time", "fermata", "notations",
             "beats", "beat-type", "clef", "sign", "line", "note", "pitch", "step", "octave", "duration",
-            "type", "direction", "direction-type", "metronome", "beat-unit", "per-minute", "barline"
+            "type", "direction", "direction-type", "metronome", "beat-unit", "per-minute", "barline", 
+            "rest", "bar-style", "backup", "accidental", "alter"
         ]
 
         const allElements = Array.from(this.xmlDoc.getElementsByTagName("*"))
@@ -136,6 +89,7 @@ export default class Chorale {
         const filteredElementNames = Array.from(allElementsAsString).filter(element => {
             return !essentialElements.includes(element);
         });
+
 
 
         filteredElementNames.forEach(element => {
@@ -215,12 +169,55 @@ export default class Chorale {
             part.appendChild(newBar)
 
         }
+    }
 
-
-
+    findKey() {
+        const keyElements = this.xmlDoc.getElementsByTagName("key")
+        var mode = null
+        var fifths = null
+        if (keyElements.length == 1) {
+            fifths = parseInt(keyElements[0].getElementsByTagName("fifths")[0].innerHTML)
+            mode = keyElements[0].getElementsByTagName("mode")[0]
+            // console.log(fifths, mode)
+        } else {
+            console.log("Multiple keys")
+        }
+        if (typeof mode == 'undefined') {
+            mode = "major" // This might be a bad idea - may need to check for accidentals
+        }
+        this.startingKeySignature = this.fifthsToKey(fifths, mode.innerHTML)
+        console.log(this.startingKeySignature)
 
 
 
     }
+
+    fifthsToKey(fifths, mode) {
+        const majorKeys = [
+            'Cb', 'Gb', 'Db', 'Ab','Eb','Bb','F','C',
+            'G', 'D', 'A', 'E', 'B', 'F#', 'C#',
+        ];
+        const minorKeys = [
+            'Ab', 'Eb','Bb', 'F', 'C', 'G', 'D', 'A',
+            'E', 'B', 'F#', 'C#', 'G#', "D#", "A#"
+        ];
+        
+        const index = fifths + 7
+
+        if (mode == "major") {
+            return majorKeys[index] + " " + mode
+        } else if (mode == "minor") {
+            return minorKeys[index] + " " + mode 
+        } else{
+            throw new Error("Unknown Mode");
+            
+        }
+
+    }
+
+      
+      
+
+    
 }
 
