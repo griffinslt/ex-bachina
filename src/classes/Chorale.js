@@ -1,5 +1,6 @@
 import { elements, MusicXML, asserts } from "@stringsync/musicxml"
 import Part from "./Part"
+import { Chord, Scale } from "tonal"
 
 export default class Chorale {
     constructor(xmlDoc) {
@@ -241,7 +242,6 @@ export default class Chorale {
                 
             }
 
-            // this.findChordsContainingNote(Note)
 
 
         });
