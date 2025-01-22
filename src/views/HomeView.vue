@@ -12,6 +12,8 @@
     <div id="target"></div>
   </div>
 
+
+
 </template>
 
 <script>
@@ -25,14 +27,26 @@ import Chorale from '@/classes/Chorale'
 export default {
 
   setup() {
+    const scores = ref([
+      '253',
+      '254',
+      '259',
+      '264',
+      '291',
+      '438',
+    ])
+    const currentScore = ref('253')
 
     const errors = ref([])
-    const { string, error, load } = getXMLAsString('/scores/BWV_0253.xml')   
+
+    const { string, error, load } = getXMLAsString('/scores/BWV_0' + currentScore.value +'.xml')   
     const xmlString = ref(string.value)
     load()
     if (error.value) {
       errors.value.push(error)
     }
+
+
 
     const showScore = () => {
       const { text, error, convert } = xmlToAbc(xmlString.value)
@@ -42,7 +56,7 @@ export default {
       }
       renderAbc("target", text.value);
     }
-
+    
     
     
     const scoreAsObject = () => {
@@ -62,7 +76,7 @@ export default {
 
 
 
-    return { errors }
+    return { errors, scores }
   }
 
 }
