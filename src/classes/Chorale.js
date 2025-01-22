@@ -13,19 +13,19 @@ export default class Chorale {
         this.findKey()
 
 
-        
+
         this.voices = [
             new Part("S"),
             new Part("A"),
             new Part("T"),
             new Part("B"),
         ]
-        
-        
-        
+
+
+
         this.timeSignature = { numerator: 4, denominator: 4 }
         this.startingKeySignature = ""
-        
+
         this.musicXmlObj = MusicXML.parse(new XMLSerializer().serializeToString(this.xmlDoc.documentElement));
         this.chooseCadences()
     }
@@ -77,7 +77,7 @@ export default class Chorale {
             "score-partwise", "work", "work-title", "part-list", "score-part", "part-name", "part",
             'measure', "attributes", "divisions", "key", "fifths", "mode", "time", "fermata", "notations",
             "beats", "beat-type", "clef", "sign", "line", "note", "pitch", "step", "octave", "duration",
-            "type", "direction", "direction-type", "metronome", "beat-unit", "per-minute", "barline", 
+            "type", "direction", "direction-type", "metronome", "beat-unit", "per-minute", "barline",
             "rest", "bar-style", "backup", "accidental", "alter"
         ]
 
@@ -197,29 +197,29 @@ export default class Chorale {
 
     fifthsToKey(fifths, mode) {
         const majorKeys = [
-            'Cb', 'Gb', 'Db', 'Ab','Eb','Bb','F','C',
+            'Cb', 'Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F', 'C',
             'G', 'D', 'A', 'E', 'B', 'F#', 'C#',
         ];
         const minorKeys = [
-            'Ab', 'Eb','Bb', 'F', 'C', 'G', 'D', 'A',
+            'Ab', 'Eb', 'Bb', 'F', 'C', 'G', 'D', 'A',
             'E', 'B', 'F#', 'C#', 'G#', "D#", "A#"
         ];
-        
+
         const index = fifths + 7
 
         if (mode == "major") {
             return majorKeys[index] + " " + mode
         } else if (mode == "minor") {
-            return minorKeys[index] + " " + mode 
-        } else{
+            return minorKeys[index] + " " + mode
+        } else {
             throw new Error("Unknown Mode");
-            
+
         }
 
     }
 
 
-    chooseCadences(){
+    chooseCadences() {
         // for each fermata location select chords
         //get part
         const part1 = this.musicXmlObj.getRoot().getParts()[0]
@@ -232,17 +232,23 @@ export default class Chorale {
             const cadenceBar = part1Bars[cadenceLocation.barNumber]
             const barContents = cadenceBar.contents[0]
             const notes = this.notesFromBar(barContents)
-            const cadenceNote = notes[cadenceLocation.noteNumber-1]
+            const cadenceNote = notes[cadenceLocation.noteNumber - 1]
 
             //find out what note it is in relation to our key
-            console.log(cadenceNote)
-            Chord
+            if (typeof cadenceNote != "undefined") {
+                const pitch = this.pitchFromNote(cadenceNote)
+                console.log(pitch)
+                
+            }
+
+            // this.findChordsContainingNote(Note)
+
 
         });
     }
 
-    notesFromBar(bar){
-        var notes =[]
+    notesFromBar(bar) {
+        var notes = []
         bar.forEach(element => {
             if (asserts.isNote(element)) {
                 notes.push(element)
@@ -252,11 +258,22 @@ export default class Chorale {
         return notes
     }
 
+    pitchFromNote(note){
+        const pitchObj = note.contents[0].filter(value => asserts.isPitch(value))[0]
+        const octaveObj = pitchObj.getOctave()
+        const stepObj = pitchObj.getStep()
+
+        return stepObj.contents[0] + octaveObj.contents[0]
+        
+
+    }
 
 
-      
-      
 
-    
+
+
+
+
+
 }
 
