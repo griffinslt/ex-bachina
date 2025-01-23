@@ -2,6 +2,9 @@
 <!--MusicXML 2.0 file created by CapToMusic.py CapXML to MusicXML converter version 1.40-->
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="2.0">
+	<work>
+		<work-title>BWV_0291</work-title>
+	</work>
 	<identification>
 		<encoding>
 			<encoding-date>2017-03-18</encoding-date>
