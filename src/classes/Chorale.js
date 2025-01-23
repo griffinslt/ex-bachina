@@ -1,6 +1,6 @@
 import { elements, MusicXML, asserts } from "@stringsync/musicxml"
 import Part from "./Part"
-import { Chord, Scale } from "tonal"
+import { Chord, Key, Scale } from "tonal"
 
 export default class Chorale {
     constructor(xmlDoc) {
@@ -11,23 +11,23 @@ export default class Chorale {
         this.computeFermataLocations()
         this.numOfBars = this.computeNumberOfBars()
         this.addNewParts()
+        this.startingKeySignature = { tonic: "", mode: "" }
         this.findKey()
 
 
 
-        this.voices = [
-            new Part("S"),
-            new Part("A"),
-            new Part("T"),
-            new Part("B"),
+        this.musicXmlObj = MusicXML.parse(new XMLSerializer().serializeToString(this.xmlDoc.documentElement));
+        this.parts = [
+            this.musicXmlObj.getRoot().getParts()[0],
+            this.musicXmlObj.getRoot().getParts()[1],
+            this.musicXmlObj.getRoot().getParts()[2],
+            this.musicXmlObj.getRoot().getParts()[3],
         ]
 
 
 
         this.timeSignature = { numerator: 4, denominator: 4 }
-        this.startingKeySignature = ""
 
-        this.musicXmlObj = MusicXML.parse(new XMLSerializer().serializeToString(this.xmlDoc.documentElement));
         this.chooseCadences()
     }
     getChoraleAsString() {
@@ -182,15 +182,13 @@ export default class Chorale {
         if (keyElements.length == 1) {
             fifths = parseInt(keyElements[0].getElementsByTagName("fifths")[0].innerHTML)
             mode = keyElements[0].getElementsByTagName("mode")[0]
-            // console.log(fifths, mode)
         } else {
-            console.log("Multiple keys")
+            throw new Error("This program cannot handle multiple keys");
         }
         if (typeof mode == 'undefined') {
             mode = "major" // This might be a bad idea - may need to check for accidentals
         }
         this.startingKeySignature = this.fifthsToKey(fifths, mode.innerHTML)
-        console.log(this.startingKeySignature)
 
 
 
@@ -209,9 +207,9 @@ export default class Chorale {
         const index = fifths + 7
 
         if (mode == "major") {
-            return majorKeys[index] + " " + mode
+            return { tonic: majorKeys[index], mode: mode }
         } else if (mode == "minor") {
-            return minorKeys[index] + " " + mode
+            return { tonic: minorKeys[index], mode: mode }
         } else {
             throw new Error("Unknown Mode");
 
@@ -223,27 +221,16 @@ export default class Chorale {
     chooseCadences() {
         // for each fermata location select chords
         //get part
-        const part1 = this.musicXmlObj.getRoot().getParts()[0]
-        const part1Bars = part1.getMeasures()
-        // console.log(part1Bars)
+        // const part1 = this.musicXmlObj.getRoot().getParts()[0]
+        const part1Bars = this.parts[0].getMeasures()
+
+        const currentKey = Key.majorKey(this.startingKeySignature.tonic)
+        console.log(currentKey)
 
 
-        // console.log(this.cadenceLocations)
         this.cadenceLocations.forEach(cadenceLocation => {
-            const cadenceBar = part1Bars[cadenceLocation.barNumber]
-            const barContents = cadenceBar.contents[0]
-            const notes = this.notesFromBar(barContents)
-            const cadenceNote = notes[cadenceLocation.noteNumber - 1]
-
-            //find out what note it is in relation to our key
-            if (typeof cadenceNote != "undefined") {
-                const pitch = this.pitchFromNote(cadenceNote)
-                console.log(pitch)
-                
-            }
-
-
-
+            const melodicPatternForCadence = this.getThreeCadenceNotes(part1Bars, cadenceLocation, currentKey)
+            console.log(melodicPatternForCadence)
         });
     }
 
@@ -258,13 +245,79 @@ export default class Chorale {
         return notes
     }
 
-    pitchFromNote(note){
+    pitchFromNote(note) {
         const pitchObj = note.contents[0].filter(value => asserts.isPitch(value))[0]
         const octaveObj = pitchObj.getOctave()
         const stepObj = pitchObj.getStep()
 
-        return stepObj.contents[0] + octaveObj.contents[0]
+        return { step: stepObj.contents[0], octave: octaveObj.contents[0] }
+
+
+    }
+
+    getThreeCadenceNotes(part1Bars, cadenceLocation, currentKey) {
+        // get the final note
+
+
+        var cadenceBar = part1Bars[cadenceLocation.barNumber]
+        if (typeof cadenceBar != "undefined") {
+            var barContents = cadenceBar.contents[0]
+            var notes = this.notesFromBar(barContents)
+            const thirdNote = notes[cadenceLocation.noteNumber]
+            
+            
+            //find out what note it is in relation to our key
+            let thirdNotePositionInScale = this.getNotePositionInScale(thirdNote, currentKey)
+            // get the second note
+            var secondNote = null
+            var barNumber = cadenceLocation.barNumber
+            var secondNotePositionInBar = null
+            if (cadenceLocation.noteNumber == 0) {
+                // go to previous bar
+                barNumber--
+                cadenceBar = part1Bars[barNumber]
+                barContents = cadenceBar.contents[0]
+                notes = this.notesFromBar(barContents)
+                secondNotePositionInBar = notes.length-1
+                secondNote = notes[secondNotePositionInBar]
+            } else{
+                secondNotePositionInBar = cadenceLocation.noteNumber - 1
+                secondNote = notes[secondNotePositionInBar]
+            }
+            
+            const secondNotePositionInScale = this.getNotePositionInScale(secondNote, currentKey)
+            // get the first note
+            var firstNote = null
+            if (secondNotePositionInBar == 0) {
+                barNumber--
+                cadenceBar = part1Bars[barNumber]
+                barContents = cadenceBar.contents[0]
+                notes = this.notesFromBar(barContents)
+                firstNote = notes[notes.length-1]
+            } else{
+                firstNote = notes[secondNotePositionInBar - 1] // check logic here
+            }
+            const firstNotePositionInScale = this.getNotePositionInScale(firstNote, currentKey)
+
+            return [firstNotePositionInScale, secondNotePositionInScale, thirdNotePositionInScale]
+            
+        }
+
+        throw new Error("Cadence Notes Not Calculated properly")
         
+
+    }
+
+    cadenceTypeSelector() {
+
+    }
+
+    getNotePositionInScale(cadenceNote, currentKey) {
+        if (typeof cadenceNote != "undefined") {
+            const pitch = this.pitchFromNote(cadenceNote)
+            const notePosition = currentKey.scale.indexOf(pitch.step)
+            return notePosition
+        }
 
     }
 
