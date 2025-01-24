@@ -35,7 +35,7 @@ export default {
       '291',
       '438',
     ])
-    const currentScore = ref('253')
+    const currentScore = ref(scores.value[2])
 
     const errors = ref([])
 
