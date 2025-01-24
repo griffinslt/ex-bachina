@@ -237,7 +237,7 @@ export default class Chorale {
         this.cadenceLocations.forEach(cadenceLocation => {
             const melodicPatternForCadence = this.getThreeCadenceNotes(part1Bars, cadenceLocation, currentKey)
             const possibleCadenceHere = this.getPossibleCadences(melodicPatternForCadence)
-            // console.log(possibleCadenceHere)
+            console.log(possibleCadenceHere)
         });
     }
 
@@ -338,11 +338,15 @@ export default class Chorale {
         // console.log("###")
         console.log(melodicPattern)
         var possibleCadences = []
+        
+        if (typeof melodicPattern == "undefined") {
+            return []
+        }
 
         if (JSON.stringify(melodicPattern) == JSON.stringify([3,2,1])) {
             possibleCadences.push(["Ic", "V", "I"])
             possibleCadences.push(["Ib", "V", "I"]) // should use a passing note int he base for this one
-        } else if(JSON.stringify(melodicPattern) == JSON.stringify([2,2,1])) {
+        } else if(JSON.stringify(melodicPattern) == JSON.stringify([2,2,1]) || JSON.stringify(melodicPattern) == JSON.stringify([2,2,3])){
             possibleCadences.push(["ii7b", "V", "I"]) // use Ib or vi as approach chords for ii7b
             possibleCadences.push(["V", "I"]) // to be used with a four three suspension
         } else if (JSON.stringify(melodicPattern) == JSON.stringify([8, 7, 8])){
@@ -360,9 +364,22 @@ export default class Chorale {
         } else if (JSON.stringify(melodicPattern) == JSON.stringify([1, 2, 1])){
             possibleCadences.push(["Ib", "V", "I"])
             possibleCadences.push(["Ib", "ii7b", "I"])
-        } else if (melodicPattern == [8, 8, 7]){
+        } else if (JSON.stringify(melodicPattern) == JSON.stringify([8, 8, 7])){
             possibleCadences.push(["Ib", "V", "I"])
-        }
+        } else if (JSON.stringify(melodicPattern) == JSON.stringify([5, 4, 3])){
+            possibleCadences.push(["I", "viib", "Ib"]) // there are some serious caveats with these
+            possibleCadences.push(["Ib", "viib", "I"]) // there are some serious caveats with these
+        } else if (JSON.stringify(melodicPattern) == JSON.stringify([5, 4, 5])){
+            possibleCadences.push("ivb to V in a minor key")
+        } else if (JSON.stringify(melodicPattern) == JSON.stringify([8, 8, 8])) {
+            possibleCadences.push(["IVc", "I", "I"])  //with auxillary note decaration of the I-I inner parts
+        } 
+        
+        melodicPattern.shift()
+        if (JSON.stringify(melodicPattern) == JSON.stringify([6, 5])) {
+            possibleCadences.push(["iv", "V"]) //unlikely
+            possibleCadences.push(["IV", "I"])  //there are alternatives apparently
+        } 
 
         return possibleCadences
 
