@@ -224,13 +224,20 @@ export default class Chorale {
         // const part1 = this.musicXmlObj.getRoot().getParts()[0]
         const part1Bars = this.parts[0].getMeasures()
 
-        const currentKey = Key.majorKey(this.startingKeySignature.tonic)
+        var currentKey = null
+        if (this.startingKeySignature.mode == "major") {
+            currentKey = Key.majorKey(this.startingKeySignature.tonic)
+        } else {
+            currentKey = Key.minorKey(this.startingKeySignature.tonic)
+
+        }
         console.log(currentKey)
 
 
         this.cadenceLocations.forEach(cadenceLocation => {
             const melodicPatternForCadence = this.getThreeCadenceNotes(part1Bars, cadenceLocation, currentKey)
-            console.log(melodicPatternForCadence)
+            const possibleCadenceHere = this.getPossibleCadences(melodicPatternForCadence)
+            // console.log(possibleCadenceHere)
         });
     }
 
@@ -249,9 +256,26 @@ export default class Chorale {
         const pitchObj = note.contents[0].filter(value => asserts.isPitch(value))[0]
         const octaveObj = pitchObj.getOctave()
         const stepObj = pitchObj.getStep()
+        const stepText = stepObj.contents[0] + this.getAccidentalFromNote(note)
 
-        return { step: stepObj.contents[0], octave: octaveObj.contents[0] }
+        return { step: stepText, octave: octaveObj.contents[0] }
 
+
+    }
+
+    getAccidentalFromNote(note){
+        var textAccidental = ""
+        if(note.getAccidental() != null){
+            textAccidental = note.getAccidental().contents[0]
+        }
+        switch (textAccidental) {
+            case "sharp":
+                return "#"
+            case "flat":
+                return "b"
+            default:
+                return ""
+        }
 
     }
 
@@ -264,6 +288,7 @@ export default class Chorale {
             var barContents = cadenceBar.contents[0]
             var notes = this.notesFromBar(barContents)
             const thirdNote = notes[cadenceLocation.noteNumber]
+            
             
             
             //find out what note it is in relation to our key
@@ -295,27 +320,69 @@ export default class Chorale {
                 notes = this.notesFromBar(barContents)
                 firstNote = notes[notes.length-1]
             } else{
-                firstNote = notes[secondNotePositionInBar - 1] // check logic here
+                firstNote = notes[secondNotePositionInBar - 1] 
             }
             const firstNotePositionInScale = this.getNotePositionInScale(firstNote, currentKey)
 
-            return [firstNotePositionInScale, secondNotePositionInScale, thirdNotePositionInScale]
+            return [firstNotePositionInScale + 1, secondNotePositionInScale + 1, thirdNotePositionInScale + 1]
             
         }
 
-        throw new Error("Cadence Notes Not Calculated properly")
+        // throw new Error("Melodic Pattern Not Calculated Properly")
         
 
     }
 
-    cadenceTypeSelector() {
+
+    getPossibleCadences(melodicPattern) {
+        // console.log("###")
+        console.log(melodicPattern)
+        var possibleCadences = []
+
+        if (JSON.stringify(melodicPattern) == JSON.stringify([3,2,1])) {
+            possibleCadences.push(["Ic", "V", "I"])
+            possibleCadences.push(["Ib", "V", "I"]) // should use a passing note int he base for this one
+        } else if(JSON.stringify(melodicPattern) == JSON.stringify([2,2,1])) {
+            possibleCadences.push(["ii7b", "V", "I"]) // use Ib or vi as approach chords for ii7b
+            possibleCadences.push(["V", "I"]) // to be used with a four three suspension
+        } else if (JSON.stringify(melodicPattern) == JSON.stringify([8, 7, 8])){
+            possibleCadences.push(["V", "I"]) // to be used with a four three suspension
+            possibleCadences.push(["ii7b", "V", "I"])
+            possibleCadences.push(["Ic", "V", "I"])
+        } else if (JSON.stringify(melodicPattern) == JSON.stringify([6, 7, 8])){
+            possibleCadences.push(["IV", "viib", "I"]) //double the third in viib
+            possibleCadences.push(["IV", "V", "I"])
+        } else if (JSON.stringify(melodicPattern) == JSON.stringify([3, 3, 2])){
+            possibleCadences.push(["Ib", "V", "I"])
+        } else if (JSON.stringify(melodicPattern) == JSON.stringify([4, 3, 2])){
+            possibleCadences.push(["viib", "Ib", "V"])
+            possibleCadences.push(["IVb", "I", "V"])
+        } else if (JSON.stringify(melodicPattern) == JSON.stringify([1, 2, 1])){
+            possibleCadences.push(["Ib", "V", "I"])
+            possibleCadences.push(["Ib", "ii7b", "I"])
+        } else if (melodicPattern == [8, 8, 7]){
+            possibleCadences.push(["Ib", "V", "I"])
+        }
+
+        return possibleCadences
 
     }
 
     getNotePositionInScale(cadenceNote, currentKey) {
         if (typeof cadenceNote != "undefined") {
             const pitch = this.pitchFromNote(cadenceNote)
-            const notePosition = currentKey.scale.indexOf(pitch.step)
+            // console.log(currentKey.type == 'minor')
+            var notePosition = null
+            if (currentKey.type == 'minor') {
+                notePosition = currentKey.melodic.scale.indexOf(pitch.step)
+                // console.log("####")
+                // console.log("Pitch:" + pitch.step)
+                // console.log("Scale:" + currentKey.melodic.scale)
+                // console.log("NotePositionInScale:" + notePosition)
+            } else {
+                notePosition = currentKey.scale.indexOf(pitch.step)
+
+            }
             return notePosition
         }
 
