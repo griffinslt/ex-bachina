@@ -263,9 +263,9 @@ export default class Chorale {
 
     }
 
-    getAccidentalFromNote(note){
+    getAccidentalFromNote(note) {
         var textAccidental = ""
-        if(note.getAccidental() != null){
+        if (note.getAccidental() != null) {
             textAccidental = note.getAccidental().contents[0]
         }
         switch (textAccidental) {
@@ -288,9 +288,9 @@ export default class Chorale {
             var barContents = cadenceBar.contents[0]
             var notes = this.notesFromBar(barContents)
             const thirdNote = notes[cadenceLocation.noteNumber]
-            
-            
-            
+
+
+
             //find out what note it is in relation to our key
             let thirdNotePositionInScale = this.getNotePositionInScale(thirdNote, currentKey)
             // get the second note
@@ -303,13 +303,13 @@ export default class Chorale {
                 cadenceBar = part1Bars[barNumber]
                 barContents = cadenceBar.contents[0]
                 notes = this.notesFromBar(barContents)
-                secondNotePositionInBar = notes.length-1
+                secondNotePositionInBar = notes.length - 1
                 secondNote = notes[secondNotePositionInBar]
-            } else{
+            } else {
                 secondNotePositionInBar = cadenceLocation.noteNumber - 1
                 secondNote = notes[secondNotePositionInBar]
             }
-            
+
             const secondNotePositionInScale = this.getNotePositionInScale(secondNote, currentKey)
             // get the first note
             var firstNote = null
@@ -318,18 +318,18 @@ export default class Chorale {
                 cadenceBar = part1Bars[barNumber]
                 barContents = cadenceBar.contents[0]
                 notes = this.notesFromBar(barContents)
-                firstNote = notes[notes.length-1]
-            } else{
-                firstNote = notes[secondNotePositionInBar - 1] 
+                firstNote = notes[notes.length - 1]
+            } else {
+                firstNote = notes[secondNotePositionInBar - 1]
             }
             const firstNotePositionInScale = this.getNotePositionInScale(firstNote, currentKey)
 
             return [firstNotePositionInScale + 1, secondNotePositionInScale + 1, thirdNotePositionInScale + 1]
-            
+
         }
 
         // throw new Error("Melodic Pattern Not Calculated Properly")
-        
+
 
     }
 
@@ -338,48 +338,48 @@ export default class Chorale {
         // console.log("###")
         console.log(melodicPattern)
         var possibleCadences = []
-        
+
         if (typeof melodicPattern == "undefined") {
             return []
         }
 
-        if (JSON.stringify(melodicPattern) == JSON.stringify([3,2,1])) {
+        if (JSON.stringify(melodicPattern) == JSON.stringify([3, 2, 1])) {
             possibleCadences.push(["Ic", "V", "I"])
             possibleCadences.push(["Ib", "V", "I"]) // should use a passing note int he base for this one
-        } else if(JSON.stringify(melodicPattern) == JSON.stringify([2,2,1]) || JSON.stringify(melodicPattern) == JSON.stringify([2,2,3])){
+        } else if (JSON.stringify(melodicPattern) == JSON.stringify([2, 2, 1]) || JSON.stringify(melodicPattern) == JSON.stringify([2, 2, 3])) {
             possibleCadences.push(["ii7b", "V", "I"]) // use Ib or vi as approach chords for ii7b
             possibleCadences.push(["V", "I"]) // to be used with a four three suspension
-        } else if (JSON.stringify(melodicPattern) == JSON.stringify([8, 7, 8])){
+        } else if (JSON.stringify(melodicPattern) == JSON.stringify([8, 7, 8])) {
             possibleCadences.push(["V", "I"]) // to be used with a four three suspension
             possibleCadences.push(["ii7b", "V", "I"])
             possibleCadences.push(["Ic", "V", "I"])
-        } else if (JSON.stringify(melodicPattern) == JSON.stringify([6, 7, 8])){
+        } else if (JSON.stringify(melodicPattern) == JSON.stringify([6, 7, 8])) {
             possibleCadences.push(["IV", "viib", "I"]) //double the third in viib
             possibleCadences.push(["IV", "V", "I"])
-        } else if (JSON.stringify(melodicPattern) == JSON.stringify([3, 3, 2])){
+        } else if (JSON.stringify(melodicPattern) == JSON.stringify([3, 3, 2])) {
             possibleCadences.push(["Ib", "V", "I"])
-        } else if (JSON.stringify(melodicPattern) == JSON.stringify([4, 3, 2])){
+        } else if (JSON.stringify(melodicPattern) == JSON.stringify([4, 3, 2])) {
             possibleCadences.push(["viib", "Ib", "V"])
             possibleCadences.push(["IVb", "I", "V"])
-        } else if (JSON.stringify(melodicPattern) == JSON.stringify([1, 2, 1])){
+        } else if (JSON.stringify(melodicPattern) == JSON.stringify([1, 2, 1])) {
             possibleCadences.push(["Ib", "V", "I"])
             possibleCadences.push(["Ib", "ii7b", "I"])
-        } else if (JSON.stringify(melodicPattern) == JSON.stringify([8, 8, 7])){
+        } else if (JSON.stringify(melodicPattern) == JSON.stringify([8, 8, 7])) {
             possibleCadences.push(["Ib", "V", "I"])
-        } else if (JSON.stringify(melodicPattern) == JSON.stringify([5, 4, 3])){
+        } else if (JSON.stringify(melodicPattern) == JSON.stringify([5, 4, 3])) {
             possibleCadences.push(["I", "viib", "Ib"]) // there are some serious caveats with these
             possibleCadences.push(["Ib", "viib", "I"]) // there are some serious caveats with these
-        } else if (JSON.stringify(melodicPattern) == JSON.stringify([5, 4, 5])){
+        } else if (JSON.stringify(melodicPattern) == JSON.stringify([5, 4, 5])) {
             possibleCadences.push("ivb to V in a minor key")
         } else if (JSON.stringify(melodicPattern) == JSON.stringify([8, 8, 8])) {
             possibleCadences.push(["IVc", "I", "I"])  //with auxillary note decaration of the I-I inner parts
-        } 
-        
+        }
+
         melodicPattern.shift()
         if (JSON.stringify(melodicPattern) == JSON.stringify([6, 5])) {
             possibleCadences.push(["iv", "V"]) //unlikely
             possibleCadences.push(["IV", "I"])  //there are alternatives apparently
-        } 
+        }
 
         return possibleCadences
 
