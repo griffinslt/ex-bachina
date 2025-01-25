@@ -236,7 +236,8 @@ export default class Chorale {
 
         this.cadenceLocations.forEach(cadenceLocation => {
             const melodicPatternForCadence = this.getThreeCadenceNotes(part1Bars, cadenceLocation, currentKey)
-            const possibleCadenceHere = this.getPossibleCadences(melodicPatternForCadence)
+            const possibleCadenceHere = this.getPossibleCadences(melodicPatternForCadence) // if there is no possible cadence then maybe it is a sign to modulate
+            const selectedCadence = this.selectCadence([["Ic", "V", "I"], ["Ib", "V", "I"], ["ii7b", "V", "I"]], possibleCadenceHere)
             console.log(possibleCadenceHere)
         });
     }
@@ -329,6 +330,7 @@ export default class Chorale {
         }
 
         // throw new Error("Melodic Pattern Not Calculated Properly")
+        console.log(cadenceBar)
 
 
     }
@@ -403,6 +405,41 @@ export default class Chorale {
             return notePosition
         }
 
+    }
+
+    selectCadence(previousCadences, possibleCadences){
+        previousCadences = previousCadences.sort(() => 0.5 - Math.random())
+        possibleCadences = possibleCadences.sort(() => 0.5 - Math.random()) // not sure if this is working
+        console.log("€€")
+        console.log(previousCadences)
+        console.log(possibleCadences)
+
+        // if any of the possible cadences are in the previous cadences, remove them unless there would be no more possible cadences (variety is better)
+        for (const possibleCadence of possibleCadences ){
+            if (this.inlcudesArray(possibleCadence, previousCadences) && possibleCadences.length > 1 ) {
+                console.log(possibleCadence, previousCadences)
+                possibleCadences.splice(this.indexOfArray(possibleCadences, possibleCadence))
+                console.log(this.indexOfArray(possibleCadences, possibleCadence))
+
+            }
+        }
+
+    }
+
+    inlcudesArray(needle, haystack){
+        for (const item of haystack){
+            if (JSON.stringify(item) == JSON.stringify(needle)) {
+                return true
+            }
+        }
+    }
+
+    indexOfArray(needle, haystack){ // this onw is not working 
+        for (const [index, item ] of haystack){
+            if (JSON.stringify(item) == JSON.stringify(needle)) {
+                return index
+            }
+        }
     }
 
 
