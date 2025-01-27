@@ -10,6 +10,7 @@
   <div class="text-center">
     <br><br>
     <div id="target"></div>
+    <div id="audio" class="w-50 position-absolute top-75 start-50 translate-middle"></div>
   </div>
 
 
@@ -19,9 +20,10 @@
 <script>
 import getXMLAsString from '@/composables/getXMLAsString';
 import xmlToAbc from '@/composables/xmlToAbc';
-import { renderAbc } from 'abcjs';
+import { renderAbc, synth } from 'abcjs';
 import { ref, watch } from 'vue';
 import Chorale from '@/classes/Chorale'
+import CursorControl from '@/classes/CursorControl';
 
 
 export default {
@@ -39,7 +41,7 @@ export default {
 
     const errors = ref([])
 
-    const { string, error, load } = getXMLAsString('/scores/BWV_0' + currentScore.value +'.xml')   
+    const { string, error, load } = getXMLAsString('/scores/BWV_0' + currentScore.value + '.xml')
     const xmlString = ref(string.value)
     load()
     if (error.value) {
@@ -54,31 +56,72 @@ export default {
       if (error.value) {
         errors.value.push(error.value)
       }
-      renderAbc("target", text.value);
+      var visualObj = renderAbc("target", text.value);
+
+      // code for playback
+      var abcOptions = { add_classes: true };
+      var audioParams = { chordsOff: true };
+
+        var cursorControl = new CursorControl();
+
+        if (synth.supportsAudio()) {
+          var synthControl = new synth.SynthController();
+          synthControl.load("#audio",
+            cursorControl,
+            {
+              displayLoop: false,
+              displayRestart: false,
+              displayPlay: true,
+              displayProgress: true,
+              displayWarp: false
+            }
+          );
+          var createSynth = new synth.CreateSynth();
+          createSynth.init({ visualObj: visualObj[0] }).then(function () {
+            synthControl.setTune(visualObj[0], false, audioParams).then(function () {
+              console.log("Audio successfully loaded.")
+            }).catch(function (error) {
+              console.warn("Audio problem:", error);
+            });
+          }).catch(function (error) {
+            console.warn("Audio problem:", error);
+          });
+        } else {
+          document.querySelector("#audio").innerHTML =
+            "Audio is not supported in this browser.";
+        }
+
+        
+
+      }
+
+
+
+
+      const scoreAsObject = () => {
+        const xmlDoc = new DOMParser().parseFromString(string.value, "text/xml")
+        var c = new Chorale(xmlDoc)
+        xmlString.value = c.getChoraleAsString()
+
+      }
+
+
+      // waits until the file is read
+      watch(string, () => {
+        scoreAsObject()
+        showScore()
+
+      })
+
+
+
+      return { errors, scores }
     }
-    
-    
-    
-    const scoreAsObject = () => {
-      const xmlDoc = new DOMParser().parseFromString(string.value, "text/xml")
-      var c = new Chorale(xmlDoc)
-      xmlString.value = c.getChoraleAsString()
 
-    } 
-    
-    
-    // waits until the file is read
-    watch(string, () => {
-      scoreAsObject()
-      showScore()
-    
-    })
-
-
-
-    return { errors, scores }
   }
 
-}
-
 </script>
+<style>
+@import 'abcjs/abcjs-audio.css';
+
+</style>
