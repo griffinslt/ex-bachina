@@ -1,6 +1,7 @@
 import { elements, MusicXML, asserts } from "@stringsync/musicxml"
 import Part from "./Part"
 import { Chord, Key, Scale } from "tonal"
+import { Duration, Note, Rest, Type } from "@stringsync/musicxml/dist/generated/elements"
 
 export default class Chorale {
     constructor(xmlDoc) {
@@ -11,18 +12,22 @@ export default class Chorale {
         this.computeFermataLocations()
         this.numOfBars = this.computeNumberOfBars()
         this.addNewParts()
+        console.log(this.xmlDoc)
         this.startingKeySignature = { tonic: "", mode: "" }
         this.findKey()
 
 
 
         this.musicXmlObj = MusicXML.parse(new XMLSerializer().serializeToString(this.xmlDoc.documentElement));
+        console.log(this.musicXmlObj)
         this.parts = [
             this.musicXmlObj.getRoot().getParts()[0],
             this.musicXmlObj.getRoot().getParts()[1],
             this.musicXmlObj.getRoot().getParts()[2],
             this.musicXmlObj.getRoot().getParts()[3],
         ]
+        // this.fillMeasuresWithRests()
+        console.log(this.musicXmlObj)
 
 
 
@@ -31,6 +36,7 @@ export default class Chorale {
         this.chooseCadences()
     }
     getChoraleAsString() {
+        return new XMLSerializer().serializeToString(this.xmlDoc.documentElement)
         return this.musicXmlObj.serialize()
     }
 
@@ -136,6 +142,7 @@ export default class Chorale {
     }
 
     initialiseBars(part) {
+
         // const measure = this.xmlDoc.createElement('measure')
         // measure.setAttribute('number', 0);
         // measure.innerHTML = '<attributes><divisions>4</divisions><key><fifths>0</fifths></key><time symbol="common"><beats>4</beats><beat-type>4</beat-type></time><staves>2</staves><clef number="1"><sign>G</sign><line>2</line></clef><clef number="2"><sign>F</sign><line>4</line></clef></attributes>'
@@ -167,11 +174,82 @@ export default class Chorale {
         // measure2.appendChild(note5)
 
         // just sets the number of bars for each part
-        for (let i = 0; i <= this.numOfBars; i++) {
+        for (let i = 0; i < this.numOfBars; i++) {
             const newBar = this.xmlDoc.createElement('measure')
+            const attributes = this.xmlDoc.createElement('attributes')
             newBar.setAttribute('number', i);
+            attributes.innerHTML = "<key><fifths>1</fifths><mode>major</mode></key><time symbol='common'><beats>4<beats><beat-type>4</beat-type><time><clef><sign>C</sign><line>4</line></clef>"
+          newBar.appendChild(attributes)
             part.appendChild(newBar)
+            const note = this.xmlDoc.createElement('note')
+            const rest = this.xmlDoc.createElement('rest')
+            const duration = this.xmlDoc.createElement('duration')
+            const type = this.xmlDoc.createElement('type')
+            const pitch = this.xmlDoc.createElement('pitch')
+            const step = this.xmlDoc.createElement('step')
+            const octave = this.xmlDoc.createElement('octave')
+            duration.innerHTML = 1920
+            type.innerHTML="whole"
 
+            step.innerHTML="B"
+            octave.innerHTML=4
+            
+            if (i % 2 ==0) {
+                note.appendChild(rest)
+                
+            } else {
+                pitch.appendChild(step)
+                pitch.appendChild(octave)
+                note.appendChild(pitch)
+
+            }
+
+            note.appendChild(type)
+            note.appendChild(duration)
+            newBar.appendChild(note)
+
+
+        }
+    }
+
+    fillMeasuresWithRests() {
+        return
+        for (const part of this.parts.slice(1)) {
+            const bars = part.getMeasures()
+            for (const bar of bars) {
+                const rest = new Rest()
+                rest.measure = true
+                // console.log(rest)
+                const beatsPerMeasure = 4// Numerator of the time signature (e.g., 4/4)
+                const divisionsPerBeat = 4// Divisions per beat (e.g., quarter note = 4 divisions)
+                const totalDuration = beatsPerMeasure * divisionsPerBeat;
+
+                const type = new Type()
+
+                // const duration = new Duration(1920)
+
+                // note.contents[0].push(rest, duration)
+                const note = new Note()
+                var duration = note.contents[0].filter(value => asserts.isDuration(value))[0]
+                note.contents[5] = type
+                // console.log(type)
+                duration.contents[0] = 1920   
+
+                // note.contents[0].push(rest)
+                // console.log(note.contents[0].filter(value => !asserts.isPitch(value)))
+
+                // console.log(duration.contents[0])
+
+
+                // note.contents[0].push(rest)
+
+                bar.contents[0].push(note)
+                // console.log(bar.notes)
+
+                console.log(note)
+
+
+            }
         }
     }
 
@@ -407,7 +485,7 @@ export default class Chorale {
 
     }
 
-    selectCadence(previousCadences, possibleCadences){
+    selectCadence(previousCadences, possibleCadences) {
         previousCadences = previousCadences.sort(() => 0.5 - Math.random())
         possibleCadences = possibleCadences.sort(() => 0.5 - Math.random()) // not sure if this is working
         console.log("€€")
@@ -415,8 +493,8 @@ export default class Chorale {
         console.log(possibleCadences)
 
         // if any of the possible cadences are in the previous cadences, remove them unless there would be no more possible cadences (variety is better)
-        for (const possibleCadence of possibleCadences ){
-            if (this.inlcudesArray(possibleCadence, previousCadences) && possibleCadences.length > 1 ) {
+        for (const possibleCadence of possibleCadences) {
+            if (this.inlcudesArray(possibleCadence, previousCadences) && possibleCadences.length > 1) {
                 console.log(possibleCadence, previousCadences)
                 possibleCadences.splice(this.indexOfArray(possibleCadences, possibleCadence))
                 console.log(this.indexOfArray(possibleCadences, possibleCadence))
@@ -426,16 +504,16 @@ export default class Chorale {
 
     }
 
-    inlcudesArray(needle, haystack){
-        for (const item of haystack){
+    inlcudesArray(needle, haystack) {
+        for (const item of haystack) {
             if (JSON.stringify(item) == JSON.stringify(needle)) {
                 return true
             }
         }
     }
 
-    indexOfArray(needle, haystack){ // this onw is not working 
-        for (const [index, item ] of haystack){
+    indexOfArray(needle, haystack) { // this onw is not working 
+        for (const [index, item] of haystack) {
             if (JSON.stringify(item) == JSON.stringify(needle)) {
                 return index
             }
