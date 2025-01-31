@@ -19,7 +19,7 @@ export default class Chorale {
 
 
         this.musicXmlObj = MusicXML.parse(new XMLSerializer().serializeToString(this.xmlDoc.documentElement));
-        console.log(this.musicXmlObj)
+        // console.log(this.musicXmlObj)
         this.parts = [
             this.musicXmlObj.getRoot().getParts()[0],
             this.musicXmlObj.getRoot().getParts()[1],
@@ -27,7 +27,7 @@ export default class Chorale {
             this.musicXmlObj.getRoot().getParts()[3],
         ]
         // this.fillMeasuresWithRests()
-        console.log(this.musicXmlObj)
+        // console.log(this.musicXmlObj)
 
 
 
@@ -36,7 +36,7 @@ export default class Chorale {
         this.chooseCadences()
     }
     getChoraleAsString() {
-        return new XMLSerializer().serializeToString(this.xmlDoc.documentElement)
+        // return new XMLSerializer().serializeToString(this.xmlDoc.documentElement)
         return this.musicXmlObj.serialize()
     }
 
@@ -178,35 +178,35 @@ export default class Chorale {
             const newBar = this.xmlDoc.createElement('measure')
             const attributes = this.xmlDoc.createElement('attributes')
             newBar.setAttribute('number', i);
-            attributes.innerHTML = "<key><fifths>1</fifths><mode>major</mode></key><time symbol='common'><beats>4<beats><beat-type>4</beat-type><time><clef><sign>C</sign><line>4</line></clef>"
-          newBar.appendChild(attributes)
+            // attributes.innerHTML = "<key><fifths>1</fifths><mode>major</mode></key><time symbol='common'><beats>4<beats><beat-type>4</beat-type><time><clef><sign>C</sign><line>4</line></clef>"
+            // newBar.appendChild(attributes)
             part.appendChild(newBar)
-            const note = this.xmlDoc.createElement('note')
-            const rest = this.xmlDoc.createElement('rest')
-            const duration = this.xmlDoc.createElement('duration')
-            const type = this.xmlDoc.createElement('type')
-            const pitch = this.xmlDoc.createElement('pitch')
-            const step = this.xmlDoc.createElement('step')
-            const octave = this.xmlDoc.createElement('octave')
-            duration.innerHTML = 1920
-            type.innerHTML="whole"
+            // const note = this.xmlDoc.createElement('note')
+            // const rest = this.xmlDoc.createElement('rest')
+            // const duration = this.xmlDoc.createElement('duration')
+            // const type = this.xmlDoc.createElement('type')
+            // const pitch = this.xmlDoc.createElement('pitch')
+            // const step = this.xmlDoc.createElement('step')
+            // const octave = this.xmlDoc.createElement('octave')
+            // duration.innerHTML = 1920
+            // type.innerHTML="whole"
 
-            step.innerHTML="B"
-            octave.innerHTML=4
+            // step.innerHTML="B"
+            // octave.innerHTML=4
             
-            if (i % 2 ==0) {
-                note.appendChild(rest)
+            // if (i % 2 ==0) {
+            //     note.appendChild(rest)
                 
-            } else {
-                pitch.appendChild(step)
-                pitch.appendChild(octave)
-                note.appendChild(pitch)
+            // } else {
+            //     pitch.appendChild(step)
+            //     pitch.appendChild(octave)
+            //     note.appendChild(pitch)
 
-            }
+            // }
 
-            note.appendChild(type)
-            note.appendChild(duration)
-            newBar.appendChild(note)
+            // note.appendChild(type)
+            // note.appendChild(duration)
+            // newBar.appendChild(note)
 
 
         }
