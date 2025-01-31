@@ -13,6 +13,7 @@
     "@stringsync/musicxml": "^0.2.1",
     "abcjs": "^6.4.4",
     "bootstrap": "^5.3.3",
+    "dagre": "^0.8.5",
     "jquery": "^3.7.1",
     "music21j": "^0.16.5",
     "tonal": "^6.4.0",
