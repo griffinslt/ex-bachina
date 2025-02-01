@@ -96,18 +96,17 @@ export default class Chorale {
         });
 
 
-        const filteredElementNames = Array.from(allElementsAsString).filter(element => {
+        const filteredElementNames = allElementsAsString.filter(element => {
             return !essentialElements.includes(element);
         });
 
 
-
-        filteredElementNames.forEach(element => {
+        for (const element of filteredElementNames) {
             var elementsToDelete = Array.from(this.xmlDoc.getElementsByTagName(element))
-            elementsToDelete.forEach(elementToDelete => {
+            for (const elementToDelete of elementsToDelete) {
                 elementToDelete.remove()
-            });
-        });
+            }
+        }
     }
 
     addNewParts() {
