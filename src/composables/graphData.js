@@ -8,6 +8,7 @@ const nodes = {
     node7: { name: "Select next chord" },//
     node8: { name: "Are there any more harmonic beats left?" },
     node9: { name: "Select next bass note" },//
+    node10: { name: "Select alto and tenor notes" },//
     hiddenNode1: { color:"white"},
     hiddenNode2: { color:"white"},
     hiddenNode3: { color:"white"}
@@ -29,6 +30,7 @@ const nodes = {
     edge8: { source: "node8", target: "node9" },
     hiddenEdge5: { source: "node9", target: "hiddenNode3"},
     hiddenEdge6: { source: "hiddenNode3", target: "node8"},
+    edge9: { source: "node8", target: "node10"},
   }
 
   const layouts = {
@@ -42,6 +44,7 @@ const nodes = {
     node7: { x: 200, y: 400 },//
     node8: { x: 0, y: 500 },
     node9: { x: 200, y: 500 },//
+    node10: { x: 0, y: 600 },
     hiddenNode1: {x: 100, y: 250},
     hiddenNode2: {x: 100, y: 350},
     hiddenNode3: {x: 100, y: 450},
