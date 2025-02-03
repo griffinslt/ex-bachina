@@ -15,3 +15,12 @@ export default {
     }
 }
 </script>
+
+
+<style>
+
+.graph {
+  width: 100%;
+  height: 600px;
+}
+</style>

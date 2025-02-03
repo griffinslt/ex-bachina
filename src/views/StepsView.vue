@@ -3,8 +3,15 @@
 
     <p>Click a Flashcard to reveal the content </p>
     <div class="row">
-        <div  v-for="step in steps" :key=step.title class="col">
-            <FlashCard :step="step"/>
+        <div class="col w-70">
+            <div class="row">
+                <div  v-for="step in steps" :key=step.title class="col">
+                    <FlashCard :step="step"/>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <FlowDiagram />
         </div>
     </div>
 </template>
@@ -12,6 +19,7 @@
 <script>
 import theoryData from '@/composables/theoryData';
 import FlashCard from '@/components/FlashCard.vue';
+import FlowDiagram from '@/components/FlowDiagram.vue';
 
 
 export default {
@@ -19,7 +27,7 @@ export default {
         const steps = theoryData.steps;
         return { steps };
     },
-    components: { FlashCard }
+    components: { FlashCard, FlowDiagram }
 }
 
 </script>
