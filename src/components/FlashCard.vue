@@ -44,5 +44,8 @@ export default {
   position: relative;
   transition: transform 0.8s;
   transform-style: preserve-3d;
+  width: 300px;
+  min-height: 300px;
 }
+
 </style>
