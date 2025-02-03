@@ -27,7 +27,7 @@
 
     </div>
     <div class="col">
-      <v-network-graph class="graph" :nodes="nodes" :edges="edges" :layouts="layouts" />
+      <FlowDiagram />
     </div>
   </div>
 
@@ -41,105 +41,98 @@ import { renderAbc, synth } from 'abcjs';
 import { ref, watch } from 'vue';
 import Chorale from '@/classes/Chorale'
 import CursorControl from '@/classes/CursorControl';
-import graphData from '@/composables/graphData';
 import theoryData from '@/composables/theoryData';
+import FlowDiagram from '@/components/FlowDiagram.vue';
 
 
 export default {
-    setup() {
-        const { nodes, edges, layouts } = graphData;
-        console.log();
-        const steps = theoryData.steps;
-        const currentStep = ref(1);
-        const scores = ref([
-            "253",
-            // '254',
-            "259",
-            "264",
-            "291",
-            "438",
-        ]);
-        const currentScore = ref(scores.value[3]);
-        const errors = ref([]);
-        // const { string, error, load } = getXMLAsString('/scores/BWV_0' + currentScore.value + '.xml')
-        const { string, error, load } = getXMLAsString("/scores/BWV_0" + currentScore.value + ".xml");
-        const xmlString = ref(string.value);
-        load();
-        if (error.value) {
-            errors.value.push(error);
-        }
-        const showScore = () => {
-            const { text, error, convert } = xmlToAbc(xmlString.value);
-            convert();
-            if (error.value) {
-                errors.value.push(error.value);
-            }
-            var visualObj = renderAbc("target", text.value);
-            // code for playback
-            var abcOptions = { add_classes: true };
-            var audioParams = { chordsOff: true };
-            var cursorControl = new CursorControl();
-            if (synth.supportsAudio()) {
-                var synthControl = new synth.SynthController();
-                synthControl.load("#audio", cursorControl, {
-                    displayLoop: false,
-                    displayRestart: false,
-                    displayPlay: true,
-                    displayProgress: true,
-                    displayWarp: false
-                });
-                var createSynth = new synth.CreateSynth();
-                createSynth.init({ visualObj: visualObj[0] }).then(function () {
-                    synthControl.setTune(visualObj[0], false, audioParams).then(function () {
-                        console.log("Audio successfully loaded.");
-                    }).catch(function (error) {
-                        console.warn("Audio problem:", error);
-                    });
-                }).catch(function (error) {
-                    console.warn("Audio problem:", error);
-                });
-            }
-            else {
-                document.querySelector("#audio").innerHTML =
-                    "Audio is not supported in this browser.";
-            }
-        };
-        const nextStep = () => {
-            if (currentStep.value < steps.length - 1) {
-                currentStep.value++;
-            }
-        };
-        const previousStep = () => {
-            if (currentStep.value > 0) {
-                currentStep.value--;
-            }
-        };
-        
-        const loadDifferentMelody = () => {
-            currentScore.value = Math.floor(Math.random() * (scores.value.length - 1)); // not working 
-            console.log(currentScore.value);
-        };
-        const scoreAsObject = () => {
-            const xmlDoc = new DOMParser().parseFromString(string.value, "text/xml");
-            var c = new Chorale(xmlDoc);
-            xmlString.value = c.getChoraleAsString();
-            console.log(xmlString.value);
-        };
-        // waits until the file is read
-        watch(string, () => {
-            scoreAsObject();
-            showScore();
+  setup() {
+    const steps = theoryData.steps;
+    const currentStep = ref(1);
+    const scores = ref([
+      "253",
+      // '254',
+      "259",
+      "264",
+      "291",
+      "438",
+    ]);
+    const currentScore = ref(scores.value[3]);
+    const errors = ref([]);
+    // const { string, error, load } = getXMLAsString('/scores/BWV_0' + currentScore.value + '.xml')
+    const { string, error, load } = getXMLAsString("/scores/BWV_0" + currentScore.value + ".xml");
+    const xmlString = ref(string.value);
+    load();
+    if (error.value) {
+      errors.value.push(error);
+    }
+    const showScore = () => {
+      const { text, error, convert } = xmlToAbc(xmlString.value);
+      convert();
+      if (error.value) {
+        errors.value.push(error.value);
+      }
+      var visualObj = renderAbc("target", text.value);
+      // code for playback
+      var abcOptions = { add_classes: true };
+      var audioParams = { chordsOff: true };
+      var cursorControl = new CursorControl();
+      if (synth.supportsAudio()) {
+        var synthControl = new synth.SynthController();
+        synthControl.load("#audio", cursorControl, {
+          displayLoop: false,
+          displayRestart: false,
+          displayPlay: true,
+          displayProgress: true,
+          displayWarp: false
         });
-        return { errors, scores, edges, nodes, layouts, steps, currentStep, nextStep, previousStep, loadDifferentMelody };
-    },
+        var createSynth = new synth.CreateSynth();
+        createSynth.init({ visualObj: visualObj[0] }).then(function () {
+          synthControl.setTune(visualObj[0], false, audioParams).then(function () {
+            console.log("Audio successfully loaded.");
+          }).catch(function (error) {
+            console.warn("Audio problem:", error);
+          });
+        }).catch(function (error) {
+          console.warn("Audio problem:", error);
+        });
+      }
+      else {
+        document.querySelector("#audio").innerHTML =
+          "Audio is not supported in this browser.";
+      }
+    };
+    const nextStep = () => {
+      if (currentStep.value < steps.length - 1) {
+        currentStep.value++;
+      }
+    };
+    const previousStep = () => {
+      if (currentStep.value > 0) {
+        currentStep.value--;
+      }
+    };
+    const loadDifferentMelody = () => {
+      currentScore.value = Math.floor(Math.random() * (scores.value.length - 1)); // not working 
+      console.log(currentScore.value);
+    };
+    const scoreAsObject = () => {
+      const xmlDoc = new DOMParser().parseFromString(string.value, "text/xml");
+      var c = new Chorale(xmlDoc);
+      xmlString.value = c.getChoraleAsString();
+      console.log(xmlString.value);
+    };
+    // waits until the file is read
+    watch(string, () => {
+      scoreAsObject();
+      showScore();
+    });
+    return { errors, scores, steps, currentStep, nextStep, previousStep, loadDifferentMelody };
+  },
+  components: { FlowDiagram }
 }
 
 </script>
 <style>
 @import 'abcjs/abcjs-audio.css';
-
-.graph {
-  width: 100%;
-  height: 600px;
-}
 </style>
