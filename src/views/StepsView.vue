@@ -1,18 +1,18 @@
 <template>
     <h1>Steps</h1>
-
-    <p>Click a Flashcard to reveal the content </p>
+    <p>There is a flashcard for each step of the harmonising process. Click on a flashcard to reveal the content </p>
+    <hr>
     <div class="row">
-        <div class="col w-70">
+        <div class="col">
             <div class="row">
                 <div  v-for="step in steps" :key=step.title class="col">
                     <FlashCard :step="step"/>
                 </div>
             </div>
         </div>
-        <div class="col">
+        <!-- <div class="col">
             <FlowDiagram />
-        </div>
+        </div> -->
     </div>
 </template>
 
@@ -25,6 +25,7 @@ import FlowDiagram from '@/components/FlowDiagram.vue';
 export default {
     setup() {
         const steps = theoryData.steps;
+        steps.shift()
         return { steps };
     },
     components: { FlashCard, FlowDiagram }
