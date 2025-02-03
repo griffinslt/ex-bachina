@@ -5,7 +5,6 @@
     </ul>
   </div>
 
-  <NavBar/>
   <div class="row">
     <div class="col text-center">
       <h1>Bach Harmony Generator</h1>
@@ -44,7 +43,6 @@ import Chorale from '@/classes/Chorale'
 import CursorControl from '@/classes/CursorControl';
 import graphData from '@/composables/graphData';
 import theoryData from '@/composables/theoryData';
-import NavBar from '@/components/NavBar.vue';
 
 
 export default {
@@ -134,7 +132,6 @@ export default {
         });
         return { errors, scores, edges, nodes, layouts, steps, currentStep, nextStep, previousStep, loadDifferentMelody };
     },
-    components: { NavBar }
 }
 
 </script>
