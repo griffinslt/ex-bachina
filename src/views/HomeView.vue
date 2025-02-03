@@ -57,7 +57,7 @@ export default {
       "291",
       "438",
     ]);
-    const currentScore = ref(scores.value[3]);
+    const currentScore = ref(scores.value[2]);
     const errors = ref([]);
     // const { string, error, load } = getXMLAsString('/scores/BWV_0' + currentScore.value + '.xml')
     const { string, error, load } = getXMLAsString("/scores/BWV_0" + currentScore.value + ".xml");
@@ -114,13 +114,13 @@ export default {
     };
     const loadDifferentMelody = () => {
       currentScore.value = Math.floor(Math.random() * (scores.value.length - 1)); // not working 
-      console.log(currentScore.value);
+      // console.log(currentScore.value);
     };
     const scoreAsObject = () => {
       const xmlDoc = new DOMParser().parseFromString(string.value, "text/xml");
       var c = new Chorale(xmlDoc);
       xmlString.value = c.getChoraleAsString();
-      console.log(xmlString.value);
+      // console.log(xmlString.value);
     };
     // waits until the file is read
     watch(string, () => {
