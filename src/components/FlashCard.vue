@@ -1,6 +1,6 @@
 <template>
 
-    <div class="flip-card">
+    <div class="card-container">
             <div @click="toggleFlashCard" class="card m-2">
             <div class="card-body">
                 <h5 v-if="!showContent" class="card-title"> {{ step.title }} </h5>
@@ -37,13 +37,8 @@ export default {
 
 <style>
 
-.flip-card:active .card {
-  transform: rotateY(180deg)
-  ;}
-
-.flip-card {
-  background-color: transparent;
-}
+.card-container:active .card {
+  transform: rotateY(180deg);}
 
 .card {
   position: relative;
