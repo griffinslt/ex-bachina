@@ -67,18 +67,17 @@ export default class Chorale {
 
 
     removeHarmony() {
-        // remove all voices that are not <voice>1</voice>
-
+        // Remove all voices that are not <voice>1</voice>
         var voiceElements = Array.from(this.xmlDoc.getElementsByTagName('voice'))
-        voiceElements.forEach(element => {
+        for (const element of voiceElements){
             if (element.innerHTML != "1") {
                 element.parentElement.remove()
             }
-        });
+        }
     }
 
     reformatXML() {
-        // remove non-essential elements from music xml
+        // Remove non-essential elements from MusicXML
 
         const essentialElements = [
             "score-partwise", "work", "work-title", "part-list", "score-part", "part-name", "part",
@@ -91,9 +90,10 @@ export default class Chorale {
         const allElements = Array.from(this.xmlDoc.getElementsByTagName("*"))
 
         var allElementsAsString = []
-        allElements.forEach(element => {
+
+        for (const element of allElements) {
             allElementsAsString.push(element.tagName)
-        });
+        }
 
 
         const filteredElementNames = allElementsAsString.filter(element => {
@@ -192,10 +192,10 @@ export default class Chorale {
 
             // step.innerHTML="B"
             // octave.innerHTML=4
-            
+
             // if (i % 2 ==0) {
             //     note.appendChild(rest)
-                
+
             // } else {
             //     pitch.appendChild(step)
             //     pitch.appendChild(octave)
@@ -232,7 +232,7 @@ export default class Chorale {
                 var duration = note.contents[0].filter(value => asserts.isDuration(value))[0]
                 note.contents[5] = type
                 // console.log(type)
-                duration.contents[0] = 1920   
+                duration.contents[0] = 1920
 
                 // note.contents[0].push(rest)
                 // console.log(note.contents[0].filter(value => !asserts.isPitch(value)))
@@ -260,10 +260,10 @@ export default class Chorale {
             fifths = parseInt(keyElements[0].getElementsByTagName("fifths")[0].innerHTML)
             mode = keyElements[0].getElementsByTagName("mode")[0]
         } else {
-            throw new Error("This program cannot handle multiple keys");
+            throw new Error("This program cannot handle multiple keys.")
         }
         if (typeof mode == 'undefined') {
-            mode = "major" // This might be a bad idea - may need to check for accidentals
+            throw new Error("Poor MusicXML - Mode note defined.")
         }
         this.startingKeySignature = this.fifthsToKey(fifths, mode.innerHTML)
 
@@ -288,7 +288,7 @@ export default class Chorale {
         } else if (mode == "minor") {
             return { tonic: minorKeys[index], mode: mode }
         } else {
-            throw new Error("Unknown Mode");
+            throw new Error("Unknown Mode")
 
         }
 
