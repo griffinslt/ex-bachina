@@ -311,18 +311,18 @@ export default class Chorale {
         // console.log(currentKey.chordScales[0])
         console.log(currentKey)
 
-
-        this.cadenceLocations.forEach(cadenceLocation => {
+        var previousCadences = []
+        for (const cadenceLocation of this.cadenceLocations){
             const melodicPatternForCadence = this.getThreeCadenceNotes(part1Bars, cadenceLocation, currentKey)
             const possibleCadenceHere = this.getPossibleCadences(melodicPatternForCadence) // if there is no possible cadence then maybe it is a sign to modulate
             if (possibleCadenceHere.length == 0) {
-                console.log("No possible cadences found")
+                previousCadences.push("No cadences found")
             } else {
-                // console.log(possibleCadenceHere)
-
-                const selectedCadence = this.selectCadence([["Ic", "V", "I"], ["Ib", "V", "I"], ["ii7b", "V", "I"]], possibleCadenceHere)
+                const selectedCadence = this.selectCadence(previousCadences, possibleCadenceHere)
+                previousCadences.push(selectedCadence)
             }
-        });
+        }
+        console.log(previousCadences)
     }
 
     notesFromBar(bar) {
@@ -492,7 +492,6 @@ export default class Chorale {
     selectCadence(previousCadences, possibleCadences) {
         previousCadences = previousCadences.sort(() => 0.5 - Math.random())
         possibleCadences = possibleCadences.sort(() => 0.5 - Math.random()) 
-        console.log("previous cadence reordered->")
 
         // if any of the possible cadences are in the previous cadences, remove them unless there would be no more possible cadences (variety is better)
         for (const possibleCadence of possibleCadences) {
