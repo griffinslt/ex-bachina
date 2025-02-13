@@ -225,9 +225,20 @@ export default class Chorale {
         // for each note that does not have a selected chord, select one
         console.log(this.noteList);
 
-    
+        for (const note of this.noteList){
+            if (note.nextNote.chord != null) {
+                
+            }
+        }
 
+    }
 
+    getPossibleChordFromNextChord(chord){
+        if (chord == "I") {
+            return ["IV", "V", "viib", "I"]
+        } else if (chord = "V") {
+            return ["I", "IV", "ii"]
+        }
     }
 
     notesFromBar(bar) {
