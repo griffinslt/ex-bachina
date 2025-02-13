@@ -1,21 +1,22 @@
 import { elements, MusicXML, asserts } from "@stringsync/musicxml"
 import Part from "./Part"
+import MyNote from "./Note"
 import { Chord, Key, Scale } from "tonal"
 import { Duration, Note, Rest, Type } from "@stringsync/musicxml/dist/generated/elements"
 
 export default class Chorale {
     constructor(xmlDoc) {
-        this.xmlDoc = xmlDoc
-        this.cadenceLocations = []
-        this.removeHarmony()
-        this.reformatXML()
+        this.xmlDoc = xmlDoc;
+        this.cadenceLocations = [];
+        this.removeHarmony();
+        this.reformatXML();
         this.computeFermataLocations()
-        this.numOfBars = this.computeNumberOfBars()
-        this.addNewParts()
+        this.numOfBars = this.computeNumberOfBars();
+        this.addNewParts();
         // console.log(this.xmlDoc)
-        this.startingKeySignature = { tonic: "", mode: "" }
-        this.findKey()
-
+        this.startingKeySignature = { tonic: "", mode: "" };
+        this.findKey();
+        this.noteList = [];
 
 
         this.musicXmlObj = MusicXML.parse(new XMLSerializer().serializeToString(this.xmlDoc.documentElement));
@@ -25,37 +26,38 @@ export default class Chorale {
             this.musicXmlObj.getRoot().getParts()[1],
             this.musicXmlObj.getRoot().getParts()[2],
             this.musicXmlObj.getRoot().getParts()[3],
-        ]
+        ];
         // this.fillMeasuresWithRests()
         // console.log(this.musicXmlObj)
 
 
 
-        this.timeSignature = { numerator: 4, denominator: 4 }
+        this.timeSignature = { numerator: 4, denominator: 4 };
 
-        this.chooseCadences()
+        this.getListOfAllNotes();
+        this.addCadenceChordsToNotes();
     }
     getChoraleAsString() {
         // return new XMLSerializer().serializeToString(this.xmlDoc.documentElement)
-        return this.musicXmlObj.serialize()
+        return this.musicXmlObj.serialize();
     }
 
     getCadenceLocations() {
-        return this.cadenceLocations
+        return this.cadenceLocations;
     }
 
     computeNumberOfBars() {
-        return this.xmlDoc.getElementsByTagName('measure').length
+        return this.xmlDoc.getElementsByTagName('measure').length;
     }
 
 
     computeFermataLocations() {
-        const allFermatas = Array.from(this.xmlDoc.getElementsByTagName('fermata'))
-        var locations = []
+        const allFermatas = Array.from(this.xmlDoc.getElementsByTagName('fermata'));
+        var locations = [];
         allFermatas.forEach(fermata => {
-            const note = fermata.parentElement.parentElement
-            const bar = note.parentElement
-            const barNumber = parseInt(bar.getAttribute('number'))
+            const note = fermata.parentElement.parentElement;
+            const bar = note.parentElement;
+            const barNumber = parseInt(bar.getAttribute('number'));
             const noteNumber = Array.prototype.indexOf.call(bar.getElementsByTagName("note"), note);
             locations.push({
                 barNumber: barNumber,
@@ -69,7 +71,7 @@ export default class Chorale {
     removeHarmony() {
         // Remove all voices that are not <voice>1</voice>
         var voiceElements = Array.from(this.xmlDoc.getElementsByTagName('voice'))
-        for (const element of voiceElements){
+        for (const element of voiceElements) {
             if (element.innerHTML != "1") {
                 element.parentElement.remove()
             }
@@ -108,6 +110,50 @@ export default class Chorale {
             }
         }
     }
+
+    getListOfAllNotes() {
+        // return
+        const part1Bars = this.parts[0].getMeasures()
+        var myNotes = []
+        for (let j = 0; j < part1Bars.length; j++) {
+            var barContents = part1Bars[j].contents[0]
+            var notes = this.notesFromBar(barContents)
+            for (let i = 0; i < notes.length; i++) {
+                const pitch = this.pitchFromNote(notes[i])
+                const myNote = new MyNote(null, null, pitch, notes[i].getType().contents[0], j)
+                myNotes.push(myNote)
+            }
+
+
+            for (let i = 0; i < myNotes.length; i++) {
+                if (i > 0) {
+                    myNotes[i].setPreviousNote(myNotes[i - 1])
+                }
+
+                if (i < myNotes.length - 1) {
+                    myNotes[i].setNextNote(myNotes[i + 1])
+                }
+            }
+
+        }
+
+        this.noteList = myNotes;
+
+    }
+
+    addCadenceChordsToNotes() {
+        const cadenceChords = this.chooseCadences();
+        for (let i = 0; i < this.cadenceLocations.length; i++) {
+            const notesFromBar = this.noteList.filter(note => note.barNumber == this.cadenceLocations[i].barNumber);
+            const cadenceNote = notesFromBar[this.cadenceLocations[i].noteNumber];
+            var currentNote = cadenceNote;
+            for (let j = cadenceChords[i].length - 1; j >= 0; j--) {
+                currentNote.chord = cadenceChords[i][j];
+                currentNote = currentNote.previousNote;
+            }
+        }
+    }
+
 
     addNewParts() {
         this.addNewPart("P2", "Alto")
@@ -312,7 +358,7 @@ export default class Chorale {
         console.log(currentKey)
 
         var previousCadences = []
-        for (const cadenceLocation of this.cadenceLocations){
+        for (const cadenceLocation of this.cadenceLocations) {
             const melodicPatternForCadence = this.getThreeCadenceNotes(part1Bars, cadenceLocation, currentKey)
             const possibleCadenceHere = this.getPossibleCadences(melodicPatternForCadence) // if there is no possible cadence then maybe it is a sign to modulate
             if (possibleCadenceHere.length == 0) {
@@ -320,9 +366,15 @@ export default class Chorale {
             } else {
                 const selectedCadence = this.selectCadence(previousCadences, possibleCadenceHere)
                 previousCadences.push(selectedCadence)
-                // console.log(previousCadences)
             }
         }
+        return previousCadences
+    }
+
+    selectOtherChords() {
+        // for each note that does not have a selected chord, select one
+
+
     }
 
     notesFromBar(bar) {
@@ -338,6 +390,10 @@ export default class Chorale {
 
     pitchFromNote(note) {
         const pitchObj = note.contents[0].filter(value => asserts.isPitch(value))[0]
+        if (typeof pitchObj == "undefined") {
+            return // do something proper here
+
+        }
         const octaveObj = pitchObj.getOctave()
         const stepObj = pitchObj.getStep()
         const stepText = stepObj.contents[0] + this.getAccidentalFromNote(note)
@@ -421,7 +477,7 @@ export default class Chorale {
 
     getPossibleCadences(melodicPattern) {
         // console.log("###")
-        console.log(melodicPattern)
+        // console.log(melodicPattern)
         var possibleCadences = []
 
         if (typeof melodicPattern == "undefined") {
@@ -464,7 +520,7 @@ export default class Chorale {
         if (JSON.stringify(melodicPattern) == JSON.stringify([6, 5])) {
             possibleCadences.push(["iv", "V"]) //unlikely
             possibleCadences.push(["IV", "I"])  //there are alternatives apparently
-        } else if (JSON.stringify(melodicPattern) == JSON.stringify([1, 2])){
+        } else if (JSON.stringify(melodicPattern) == JSON.stringify([1, 2])) {
             possibleCadences.push(["I", "V"])
             possibleCadences.push(["IV", "V"])
         }
@@ -494,18 +550,18 @@ export default class Chorale {
 
     selectCadence(previousCadences, possibleCadences) {
         // previousCadences = previousCadences.sort(() => 0.5 - Math.random())
-        possibleCadences = possibleCadences.sort(() => 0.5 - Math.random()) 
+        possibleCadences = possibleCadences.sort(() => 0.5 - Math.random())
 
         // if any of the possible cadences are in the previous cadences, remove them unless there would be no more possible cadences (variety is better)
-        for (const possibleCadence of possibleCadences) {
-            console.log(this.inlcudesArray(possibleCadence, previousCadences))
-            if (this.inlcudesArray(possibleCadence, previousCadences) && possibleCadences.length > 1) {
-                const indexToRemove = this.indexOfArray(possibleCadence, previousCadences)
-                console.log("Index: " + indexToRemove)
-                possibleCadences.splice(indexToRemove, 1)
+        // for (const possibleCadence of possibleCadences) {
+        //     console.log(this.inlcudesArray(possibleCadence, previousCadences))
+        //     if (this.inlcudesArray(possibleCadence, previousCadences) && possibleCadences.length > 1) {
+        //         const indexToRemove = this.indexOfArray(possibleCadence, previousCadences)
+        //         console.log("Index: " + indexToRemove)
+        //         possibleCadences.splice(indexToRemove, 1)
 
-            }
-        }
+        //     }
+        // }
         return possibleCadences[0]
 
     }
@@ -517,7 +573,7 @@ export default class Chorale {
         return false
     }
 
-    indexOfArray(needle, haystack) { 
+    indexOfArray(needle, haystack) {
         console.log(haystack)
         for (let i = 0; i < haystack.length; i++) {
             if (JSON.stringify(haystack[i]) == JSON.stringify(needle)) {
