@@ -1,8 +1,6 @@
-import { elements, MusicXML, asserts } from "@stringsync/musicxml"
-import Part from "./Part"
+import { MusicXML, asserts } from "@stringsync/musicxml"
 import MyNote from "./Note"
-import { Chord, Key, Scale } from "tonal"
-import { Duration, Note, Rest, Type } from "@stringsync/musicxml/dist/generated/elements"
+import { Key } from "tonal"
 
 export default class Chorale {
     constructor(xmlDoc) {
@@ -12,23 +10,18 @@ export default class Chorale {
         this.reformatXML();
         this.computeFermataLocations()
         this.numOfBars = this.computeNumberOfBars();
-        this.addNewParts();
-        // console.log(this.xmlDoc)
         this.startingKeySignature = { tonic: "", mode: "" };
         this.findKey();
         this.noteList = [];
 
 
         this.musicXmlObj = MusicXML.parse(new XMLSerializer().serializeToString(this.xmlDoc.documentElement));
-        // console.log(this.musicXmlObj)
         this.parts = [
             this.musicXmlObj.getRoot().getParts()[0],
             this.musicXmlObj.getRoot().getParts()[1],
             this.musicXmlObj.getRoot().getParts()[2],
             this.musicXmlObj.getRoot().getParts()[3],
         ];
-        // this.fillMeasuresWithRests()
-        // console.log(this.musicXmlObj)
 
 
 
@@ -112,7 +105,6 @@ export default class Chorale {
     }
 
     getListOfAllNotes() {
-        // return
         const part1Bars = this.parts[0].getMeasures()
         var myNotes = []
         for (let j = 0; j < part1Bars.length; j++) {
@@ -154,149 +146,6 @@ export default class Chorale {
         }
     }
 
-
-    addNewParts() {
-        this.addNewPart("P2", "Alto")
-        this.addNewPart("P3", "Tenor")
-        this.addNewPart("P4", "Bass")
-        const partList = this.xmlDoc.getElementsByTagName("part-list")[0]
-        // console.log(this.xmlDoc)
-
-
-    }
-
-    addNewPart(id, name) {
-        const partList = this.xmlDoc.getElementsByTagName("part-list")[0]
-        const scorePart = this.xmlDoc.createElement("score-part")
-        scorePart.id = id
-        const partName = this.xmlDoc.createElement("part-name")
-        partName.textContent = name
-        scorePart.appendChild(partName)
-        partList.appendChild(scorePart)
-
-        const part = this.xmlDoc.createElement('part');
-        part.id = id
-
-        const scorePartWise = this.xmlDoc.getElementsByTagName("score-partwise")[0]
-        scorePartWise.appendChild(part);
-
-
-        // Add a measures to the new part
-        this.initialiseBars(part)
-
-    }
-
-    initialiseBars(part) {
-
-        // const measure = this.xmlDoc.createElement('measure')
-        // measure.setAttribute('number', 0);
-        // measure.innerHTML = '<attributes><divisions>4</divisions><key><fifths>0</fifths></key><time symbol="common"><beats>4</beats><beat-type>4</beat-type></time><staves>2</staves><clef number="1"><sign>G</sign><line>2</line></clef><clef number="2"><sign>F</sign><line>4</line></clef></attributes>'
-        // const note = this.xmlDoc.createElement('note');
-        // note.innerHTML = "<pitch><step>E</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type>"
-        // part.appendChild(measure)
-        // measure.appendChild(note)
-
-
-        // const note2 = this.xmlDoc.createElement('note');
-        // note2.innerHTML = "<pitch><step>E</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type>"
-
-        // const note3 = this.xmlDoc.createElement('note');
-        // note3.innerHTML = "<pitch><step>E</step><octave>3</octave></pitch><duration>1</duration><type>quarter</type>"
-
-        // const note4 = this.xmlDoc.createElement('note');
-        // note4.innerHTML = "<pitch><step>E</step><octave>5</octave></pitch><duration>1</duration><type>quarter</type>"
-
-        // const note5 = this.xmlDoc.createElement('note');
-        // note5.innerHTML = "<pitch><step>E</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type>"
-
-
-        // const measure2 = this.xmlDoc.createElement('measure')
-        // measure2.setAttribute('number', 1);
-        // part.appendChild(measure2)
-        // measure2.appendChild(note2)
-        // measure2.appendChild(note3)
-        // measure2.appendChild(note4)
-        // measure2.appendChild(note5)
-
-        // just sets the number of bars for each part
-        for (let i = 0; i < this.numOfBars; i++) {
-            const newBar = this.xmlDoc.createElement('measure')
-            const attributes = this.xmlDoc.createElement('attributes')
-            newBar.setAttribute('number', i);
-            // attributes.innerHTML = "<key><fifths>1</fifths><mode>major</mode></key><time symbol='common'><beats>4<beats><beat-type>4</beat-type><time><clef><sign>C</sign><line>4</line></clef>"
-            // newBar.appendChild(attributes)
-            part.appendChild(newBar)
-            // const note = this.xmlDoc.createElement('note')
-            // const rest = this.xmlDoc.createElement('rest')
-            // const duration = this.xmlDoc.createElement('duration')
-            // const type = this.xmlDoc.createElement('type')
-            // const pitch = this.xmlDoc.createElement('pitch')
-            // const step = this.xmlDoc.createElement('step')
-            // const octave = this.xmlDoc.createElement('octave')
-            // duration.innerHTML = 1920
-            // type.innerHTML="whole"
-
-            // step.innerHTML="B"
-            // octave.innerHTML=4
-
-            // if (i % 2 ==0) {
-            //     note.appendChild(rest)
-
-            // } else {
-            //     pitch.appendChild(step)
-            //     pitch.appendChild(octave)
-            //     note.appendChild(pitch)
-
-            // }
-
-            // note.appendChild(type)
-            // note.appendChild(duration)
-            // newBar.appendChild(note)
-
-
-        }
-    }
-
-    fillMeasuresWithRests() {
-        return
-        for (const part of this.parts.slice(1)) {
-            const bars = part.getMeasures()
-            for (const bar of bars) {
-                const rest = new Rest()
-                rest.measure = true
-                // console.log(rest)
-                const beatsPerMeasure = 4// Numerator of the time signature (e.g., 4/4)
-                const divisionsPerBeat = 4// Divisions per beat (e.g., quarter note = 4 divisions)
-                const totalDuration = beatsPerMeasure * divisionsPerBeat;
-
-                const type = new Type()
-
-                // const duration = new Duration(1920)
-
-                // note.contents[0].push(rest, duration)
-                const note = new Note()
-                var duration = note.contents[0].filter(value => asserts.isDuration(value))[0]
-                note.contents[5] = type
-                // console.log(type)
-                duration.contents[0] = 1920
-
-                // note.contents[0].push(rest)
-                // console.log(note.contents[0].filter(value => !asserts.isPitch(value)))
-
-                // console.log(duration.contents[0])
-
-
-                // note.contents[0].push(rest)
-
-                bar.contents[0].push(note)
-                // console.log(bar.notes)
-
-                console.log(note)
-
-
-            }
-        }
-    }
 
     findKey() {
         const keyElements = this.xmlDoc.getElementsByTagName("key")
