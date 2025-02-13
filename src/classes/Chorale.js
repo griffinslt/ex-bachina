@@ -320,9 +320,9 @@ export default class Chorale {
             } else {
                 const selectedCadence = this.selectCadence(previousCadences, possibleCadenceHere)
                 previousCadences.push(selectedCadence)
+                // console.log(previousCadences)
             }
         }
-        console.log(previousCadences)
     }
 
     notesFromBar(bar) {
@@ -449,14 +449,14 @@ export default class Chorale {
         } else if (JSON.stringify(melodicPattern) == JSON.stringify([1, 2, 1])) {
             possibleCadences.push(["Ib", "V", "I"])
             possibleCadences.push(["Ib", "ii7b", "I"])
-        } else if (JSON.stringify(melodicPattern) == JSON.stringify([8, 8, 7])) {
+        } else if (JSON.stringify(melodicPattern) == JSON.stringify([1, 1, 7])) { // 887
             possibleCadences.push(["Ib", "V", "I"])
         } else if (JSON.stringify(melodicPattern) == JSON.stringify([5, 4, 3])) {
             possibleCadences.push(["I", "viib", "Ib"]) // there are some serious caveats with these
             possibleCadences.push(["Ib", "viib", "I"]) // there are some serious caveats with these
         } else if (JSON.stringify(melodicPattern) == JSON.stringify([5, 4, 5])) {
             possibleCadences.push("ivb to V in a minor key")
-        } else if (JSON.stringify(melodicPattern) == JSON.stringify([8, 8, 8])) {
+        } else if (JSON.stringify(melodicPattern) == JSON.stringify([1, 1, 1])) { //888
             possibleCadences.push(["IVc", "I", "I"])  //with auxillary note decaration of the I-I inner parts
         }
 
@@ -464,6 +464,9 @@ export default class Chorale {
         if (JSON.stringify(melodicPattern) == JSON.stringify([6, 5])) {
             possibleCadences.push(["iv", "V"]) //unlikely
             possibleCadences.push(["IV", "I"])  //there are alternatives apparently
+        } else if (JSON.stringify(melodicPattern) == JSON.stringify([1, 2])){
+            possibleCadences.push(["I", "V"])
+            possibleCadences.push(["IV", "V"])
         }
         return possibleCadences
 
@@ -490,31 +493,32 @@ export default class Chorale {
     }
 
     selectCadence(previousCadences, possibleCadences) {
-        previousCadences = previousCadences.sort(() => 0.5 - Math.random())
+        // previousCadences = previousCadences.sort(() => 0.5 - Math.random())
         possibleCadences = possibleCadences.sort(() => 0.5 - Math.random()) 
 
         // if any of the possible cadences are in the previous cadences, remove them unless there would be no more possible cadences (variety is better)
         for (const possibleCadence of possibleCadences) {
+            console.log(this.inlcudesArray(possibleCadence, previousCadences))
             if (this.inlcudesArray(possibleCadence, previousCadences) && possibleCadences.length > 1) {
                 const indexToRemove = this.indexOfArray(possibleCadence, previousCadences)
-                possibleCadences.splice(indexToRemove)
+                console.log("Index: " + indexToRemove)
+                possibleCadences.splice(indexToRemove, 1)
 
             }
         }
-
-        return possibleCadences
+        return possibleCadences[0]
 
     }
 
     inlcudesArray(needle, haystack) {
-        for (const item of haystack) {
-            if (JSON.stringify(item) == JSON.stringify(needle)) {
-                return true
-            }
+        if (JSON.stringify(haystack).includes(JSON.stringify(needle))) {
+            return true
         }
+        return false
     }
 
     indexOfArray(needle, haystack) { 
+        console.log(haystack)
         for (let i = 0; i < haystack.length; i++) {
             if (JSON.stringify(haystack[i]) == JSON.stringify(needle)) {
                 return i

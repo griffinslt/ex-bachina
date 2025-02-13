@@ -72,6 +72,7 @@ export default {
       if (error.value) {
         errors.value.push(error.value);
       }
+      console.log(text.value)
       var visualObj = renderAbc("target", text.value);
       // code for playback
       var abcOptions = { add_classes: true };
