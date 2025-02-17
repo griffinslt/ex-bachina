@@ -34,6 +34,10 @@ export default class Chorale {
         return this.musicXmlObj.serialize();
     }
 
+    getNoteList(){
+        return this.noteList;
+    }
+
     getCadenceLocations() {
         return this.cadenceLocations;
     }
