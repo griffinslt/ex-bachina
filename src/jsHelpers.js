@@ -13,4 +13,8 @@ const indexOfArray = (needle, haystack) => {
     return null;
 }
 
-export default { pluck, inlcudesArray, indexOfArray }
+const randomise = (arr) => {
+    return arr = arr.sort(() => 0.5 - Math.random());
+}
+
+export default { pluck, inlcudesArray, indexOfArray, randomise }
