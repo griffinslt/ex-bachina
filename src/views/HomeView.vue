@@ -43,10 +43,12 @@ import Chorale from '@/classes/Chorale'
 import CursorControl from '@/classes/CursorControl';
 import theoryData from '@/composables/theoryData';
 import FlowDiagram from '@/components/FlowDiagram.vue';
+import ABCChorale from '@/classes/ABCChorale';
 
 
 export default {
   setup() {
+    var chorale = null;
     const steps = theoryData.steps;
     const currentStep = ref(1);
     const scores = ref([
@@ -72,7 +74,8 @@ export default {
       if (error.value) {
         errors.value.push(error.value);
       }
-      console.log(text.value)
+      // console.log(text.value)
+      const abcChorale = new ABCChorale(text.value, chorale.getNoteList())
       var visualObj = renderAbc("target", text.value);
       // code for playback
       var abcOptions = { add_classes: true };
@@ -119,8 +122,8 @@ export default {
     };
     const scoreAsObject = () => {
       const xmlDoc = new DOMParser().parseFromString(string.value, "text/xml");
-      var c = new Chorale(xmlDoc);
-      xmlString.value = c.getChoraleAsString();
+      chorale = new Chorale(xmlDoc);
+      xmlString.value = chorale.getChoraleAsString();
       // console.log(xmlString.value);
     };
     // waits until the file is read
