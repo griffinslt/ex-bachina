@@ -1,18 +1,20 @@
 import { MusicXML, asserts } from "@stringsync/musicxml"
 import MyNote from "./Note"
-import { Key } from "tonal"
+import { Chord, Key } from "tonal"
+import jsHelpers from "@/jsHelpers";
 
 export default class Chorale {
     constructor(xmlDoc) {
         this.xmlDoc = xmlDoc;
         this.cadenceLocations = [];
+        this.startingKeySignature = { tonic: "", mode: "" };
+        this.noteList = [];
+        this.timeSignature = { numerator: 4, denominator: 4 };
         this.removeHarmony();
         this.reformatXML();
         this.computeFermataLocations()
         this.numOfBars = this.computeNumberOfBars();
-        this.startingKeySignature = { tonic: "", mode: "" };
         this.findKey();
-        this.noteList = [];
 
 
         this.musicXmlObj = MusicXML.parse(new XMLSerializer().serializeToString(this.xmlDoc.documentElement));
@@ -22,10 +24,6 @@ export default class Chorale {
             this.musicXmlObj.getRoot().getParts()[2],
             this.musicXmlObj.getRoot().getParts()[3],
         ];
-
-
-
-        this.timeSignature = { numerator: 4, denominator: 4 };
 
         this.getListOfAllNotes();
         this.addCadenceChordsToNotes();
@@ -204,6 +202,7 @@ export default class Chorale {
             currentKey = Key.minorKey(this.startingKeySignature.tonic);
 
         }
+        this.currentKey = currentKey;
         // console.log(currentKey.chordScales[0])
         console.log(currentKey);
 
@@ -223,21 +222,58 @@ export default class Chorale {
 
     selectOtherChords() {
         // for each note that does not have a selected chord, select one
-        console.log(this.noteList);
-
+        
         for (const note of this.noteList){
-            if (note.nextNote.chord != null) {
-                
+            if (note.nextNote != null) {
+                if (note.nextNote.chord != null) {
+                    var possibleChords = this.getPossibleChordFromNextChord(note.nextNote.chord);
+                    // now select a chord from the possible chords
+                    this.selectChord(possibleChords, note);
+                } 
             }
         }
+        console.log(jsHelpers.pluck(this.noteList, 'chord'));
 
     }
 
+    selectChord(possibleChords, note){
+        const grades = this.currentKey.grades;
+        var chordsToRemove = [];
+        for (let chord of possibleChords){
+            const formattedChord =  this.separateInversion(chord);
+            const gradeIndex =  grades.indexOf(formattedChord.numeral);
+            const chordNotes = Chord.get(this.currentKey.triads[gradeIndex]).notes;
+            if (!chordNotes.includes(note.pitch.step)) {
+                chordsToRemove.push(chord);
+            }   
+        }
+
+        for (let chord of chordsToRemove){
+            if (possibleChords.includes(chord)) {
+                possibleChords.splice(possibleChords.indexOf(chord), 1)
+            }
+        }
+    
+
+    }
+
+    separateInversion(chord){
+        var chord = chord.toUpperCase();
+        if (chord.includes('B')) {
+            return { numeral: chord.replace('B', ''), inversion: 'b' };
+        } else if (chord.includes('C')) {
+            return { numeral: chord.replace('C', ''), inversion: 'c' };
+        }
+        return { numeral: chord, inversion: 'a'};
+    }
+    
+
+
     getPossibleChordFromNextChord(chord){
         if (chord == "I") {
-            return ["IV", "V", "viib", "I"]
+            return ["IV", "V", "viib", "I"];
         } else if (chord = "V") {
-            return ["I", "IV", "ii"]
+            return ["I", "IV", "ii"];
         }
     }
 
@@ -430,18 +466,7 @@ export default class Chorale {
 
     }
 
-    inlcudesArray(needle, haystack) {
-        return JSON.stringify(haystack).includes(JSON.stringify(needle));
-    }
-
-    indexOfArray(needle, haystack) {
-        for (let i = 0; i < haystack.length; i++) {
-            if (JSON.stringify(haystack[i]) == JSON.stringify(needle)) {
-                return i;
-            }
-        }
-        return null;
-    }
+    
 
 
 
