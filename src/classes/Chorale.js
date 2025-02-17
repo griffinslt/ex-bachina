@@ -222,11 +222,7 @@ export default class Chorale {
 
     selectOtherChords() {
         // for each note that does not have a selected chord, select one
-
-
-        // while jsHelpers.pluck(this.noteList, 'chord').includes(null)
-        
-        for (const note of this.noteList){
+        for (const note of this.noteList.reverse()){
             if (note.nextNote != null) {
                 if (note.nextNote.chord != null) {
                     var possibleChords = this.getPossibleChordFromNextChord(note.nextNote.chord);
@@ -234,14 +230,8 @@ export default class Chorale {
                     note.chord = this.selectChord(possibleChords, note);
                 } 
             }
-            else if (note.previousNote != null){
-                if (note.previousNote.chord != null) {
-                    var possibleChords = this.getPossibleChordFromPreviousChord(note.previousNote.chord);
-                    note.chord = this.selectChord(possibleChords, note);
-                }
-            }
         }
-        console.log(jsHelpers.pluck(this.noteList, 'chord'));
+        this.noteList.reverse()
 
     }
 
@@ -252,9 +242,12 @@ export default class Chorale {
             const formattedChord =  this.separateInversion(chord);
             const gradeIndex =  grades.indexOf(formattedChord.numeral);
             const chordNotes = Chord.get(this.currentKey.triads[gradeIndex]).notes;
-            if (!chordNotes.includes(note.pitch.step)) {
-                chordsToRemove.push(chord);
-            }   
+            if (note.pitch != null) {
+                
+                if (!chordNotes.includes(note.pitch.step)) {
+                    chordsToRemove.push(chord);
+                }   
+            }
         }
 
         for (let chord of chordsToRemove){
@@ -265,6 +258,13 @@ export default class Chorale {
         
         return jsHelpers.randomise(possibleChords)[0];
 
+    }
+
+    getTriadFromNumeral(numeral){
+        const grades = this.currentKey.grades;
+        const gradeIndex =  grades.indexOf(numeral);
+        const chordNotes = Chord.get(this.currentKey.triads[gradeIndex]).notes;
+        return chordNotes;
     }
 
     separateInversion(chord){
@@ -278,17 +278,24 @@ export default class Chorale {
     }
     
 
-
-
-    getPossibleChordFromPreviousChord(chord){
-        return [];
-    }
-
     getPossibleChordFromNextChord(chord){
-        if (chord == "I") {
-            return ["IV", "V", "viib", "I"];
-        } else if (chord = "V") {
-            return ["I", "IV", "ii"];
+        switch (chord) {
+            case "I":
+                return ["IV", "V", "viib", "I"];
+            case "V":
+                return ["I", "IV", "ii"];
+            case "IV":
+                return ["IV", "V", "I", "vi"];
+            case "viib":
+                return ["ii", "I"];
+            case "ii":
+                return ["IV", "vi"];
+            case "vi":
+                return ["I", "ii"]//, "iii"] - add in later
+            default:
+                console.log(chord)
+                throw new Error("No valid chord")
+                break;
         }
     }
 
