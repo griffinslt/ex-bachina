@@ -222,14 +222,23 @@ export default class Chorale {
 
     selectOtherChords() {
         // for each note that does not have a selected chord, select one
+
+
+        // while jsHelpers.pluck(this.noteList, 'chord').includes(null)
         
         for (const note of this.noteList){
             if (note.nextNote != null) {
                 if (note.nextNote.chord != null) {
                     var possibleChords = this.getPossibleChordFromNextChord(note.nextNote.chord);
                     // now select a chord from the possible chords
-                    this.selectChord(possibleChords, note);
+                    note.chord = this.selectChord(possibleChords, note);
                 } 
+            }
+            else if (note.previousNote != null){
+                if (note.previousNote.chord != null) {
+                    var possibleChords = this.getPossibleChordFromPreviousChord(note.previousNote.chord);
+                    note.chord = this.selectChord(possibleChords, note);
+                }
             }
         }
         console.log(jsHelpers.pluck(this.noteList, 'chord'));
@@ -253,7 +262,8 @@ export default class Chorale {
                 possibleChords.splice(possibleChords.indexOf(chord), 1)
             }
         }
-    
+        
+        return jsHelpers.randomise(possibleChords)[0];
 
     }
 
@@ -268,6 +278,11 @@ export default class Chorale {
     }
     
 
+
+
+    getPossibleChordFromPreviousChord(chord){
+        return [];
+    }
 
     getPossibleChordFromNextChord(chord){
         if (chord == "I") {
