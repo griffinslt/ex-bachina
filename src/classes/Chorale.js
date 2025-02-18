@@ -207,8 +207,6 @@ export default class Chorale {
 
         }
         this.currentKey = currentKey;
-        // console.log(currentKey.chordScales[0])
-        console.log(currentKey);
 
         var previousCadences = [];
         for (const cadenceLocation of this.cadenceLocations) {
