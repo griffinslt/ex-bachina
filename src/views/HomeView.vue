@@ -75,7 +75,8 @@ export default {
         errors.value.push(error.value);
       }
       // console.log(text.value)
-      const abcChorale = new ABCChorale(text.value, chorale.getNoteList())
+      const abcChorale = new ABCChorale(text.value, chorale)
+      text.value = abcChorale.getString();
       var visualObj = renderAbc("target", text.value);
       // code for playback
       var abcOptions = { add_classes: true };
