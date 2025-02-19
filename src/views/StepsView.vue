@@ -24,8 +24,7 @@ import FlowDiagram from '@/components/FlowDiagram.vue';
 
 export default {
     setup() {
-        const steps = theoryData.steps;
-        steps.shift()
+        const steps = theoryData.steps.slice(0);
         return { steps };
     },
     components: { FlashCard, FlowDiagram }
