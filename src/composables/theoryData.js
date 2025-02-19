@@ -18,11 +18,16 @@ const steps =
         },
         {
             title: "Find Cadence Locations",
-            content: []
+            content: [
+                "Simply find the notes underneath the fermatae. (𝄐)"
+            ]
         },
         {
             title: "Choose Cadence Chords",
-            content: []
+            content: [
+                "For each of the cadence locations look at the pattern in the melody line e.g. if the key is G major and the notes leading up to the cadence are B, A and G the pattern is 3-2-1",
+                "If the pattern is 3-2-1 the possible chords are ..."
+            ]
         },
         {
             title: "Selecting other chords",
