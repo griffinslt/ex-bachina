@@ -11,6 +11,7 @@
       <div class="">
         <br><br>
         <div id="target"></div>
+        <div id="audio" class=""></div>
         <div class="bg-light border rounded my-3 p-5 text-start">
           <p><strong>{{ steps[currentStep].title }}</strong></p>
           <ul v-for="point in steps[currentStep].content">
@@ -22,7 +23,6 @@
           <button @click="previousStep" class="btn btn-secondary">Back a Step</button> |
           <button @click="loadDifferentMelody" class="btn btn-info">Load a Different Melody</button>
         </p>
-        <div id="audio" class=""></div>
       </div>
 
     </div>
