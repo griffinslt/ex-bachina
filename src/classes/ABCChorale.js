@@ -16,8 +16,6 @@ export default class ABCChorale {
         this.linebreaks = jsHelpers.indexOfItemInElement(voice1Bars, "\n");
         this.writeBassLine();
         this.writeAltoAndTenorParts();
-
-
     }
 
     addPassingNotes(string) {
@@ -44,16 +42,11 @@ export default class ABCChorale {
 
                 if (!/\d/.test(stringAsArray[i])) {
                     if (nextNote != undefined) {
-
-
-
-
                         if (currentNoteVal == nextNote.charCodeAt(0)) {
                             if (currentNoteVal == 65) {
                                 currentNoteVal += 7
                             }
                             var temp = stringAsArray[i].slice(1)
-
                             const newNote = String.fromCharCode(currentNoteVal - 1) + temp;
                             newString += stringAsArray[i] + "1/2 " + newNote + "1/2 "
                         }
@@ -76,12 +69,9 @@ export default class ABCChorale {
                     newString += stringAsArray[i];
                 }
 
-
-
             } else {
                 newString += stringAsArray[i];
             }
-
 
         }
         return newString + stringAsArray[stringAsArray.length - 1] + doubleBarLine;
@@ -171,10 +161,6 @@ export default class ABCChorale {
 
         this.abcString += this.addPassingNotes(altoLineString) + "\n";
         this.abcString += this.addPassingNotes(tenorLineString) + "\n";
-
-
-
-
     }
 
 
@@ -214,7 +200,7 @@ export default class ABCChorale {
                 }
             }
             if (note.pitch != null) {
-                const bassNote = this.getBassNote(note.chord, this.getKey())
+                const bassNote = this.getBassNote(note.chord)
                 if (typeof bassNote == "undefined") {
                     console.log(note)
                 }
@@ -233,11 +219,7 @@ export default class ABCChorale {
             if (note.nextNote == null) {
                 bassLineString += " |]";
             }
-
-
-
         }
-
 
         this.abcString += this.addPassingNotes(bassLineString) + "\n";
     }
@@ -259,26 +241,6 @@ export default class ABCChorale {
             default:
                 throw Error("Invalid inversion");
         }
-        // const grades = key.grades;
-        // const gradeIndex =  grades.indexOf(numeral);s
-        // const chordNotes = Chord.get(key.triads[gradeIndex]).notes;
-        // return chordNotes;
     }
-
-    getKey() {
-        const stringToSearch = "K:";
-        const startingIndex = this.abcString.indexOf(stringToSearch) + 2;
-        const stringAfterStaringIndex = this.abcString.substring(startingIndex, this.abcString.length);
-        const endingIndex = stringAfterStaringIndex.indexOf("\n");
-        const key = stringAfterStaringIndex.substring(0, endingIndex);
-
-        if (key.includes("m")) {
-            const tonic = key.substring(0, key.indexOf("m"));
-            return Key.minorKey(tonic);
-        } else {
-            return Key.majorKey(key);
-        }
-    }
-
 
 }
