@@ -27,7 +27,16 @@ export default class Chorale {
 
         this.getListOfAllNotes();
         this.addCadenceChordsToNotes();
-        this.selectOtherChords();
+
+
+        // This is a tennporary fix  - there is a deeper problem
+        var repetitionCount = 0;
+        do  {
+            repetitionCount++;
+            this.selectOtherChords();
+            var containsNullsOrUndefineds = jsHelpers.pluck(this.noteList, 'chord').filter((val) => val == undefined || val == null);
+            
+        } while (containsNullsOrUndefineds.length > 0 && repetitionCount > 10 );
     }
     getChoraleAsString() {
         // return new XMLSerializer().serializeToString(this.xmlDoc.documentElement)
@@ -224,6 +233,7 @@ export default class Chorale {
     }
 
     selectOtherChords() {
+
         // for each note that does not have a selected chord, select one
         for (const note of this.noteList.reverse()){
             if (note.nextNote != null) {
@@ -235,6 +245,9 @@ export default class Chorale {
             }
         }
         this.noteList.reverse()
+
+        
+
 
     }
 
