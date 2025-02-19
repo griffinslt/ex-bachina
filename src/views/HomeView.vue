@@ -14,13 +14,11 @@
         <div id="audio" class=""></div>
         <div class="bg-light border rounded my-3 p-5 text-start">
           <p><strong>{{ steps[currentStep].title }}</strong></p>
-          <ul v-for="point in steps[currentStep].content">
-            <li>{{ point }}</li>
-          </ul>
+          <ReadMore :steps="steps[currentStep].content"/>
         </div>
         <p class="text-start">
-          <button @click="nextStep" class="btn btn-primary text-white">Next Step</button> |
           <button @click="previousStep" class="btn btn-secondary">Back a Step</button> |
+          <button @click="nextStep" class="btn btn-primary text-white">Next Step</button> |
           <button @click="loadDifferentMelody" class="btn btn-info">Load a Different Melody</button>
         </p>
       </div>
@@ -44,6 +42,7 @@ import CursorControl from '@/classes/CursorControl';
 import theoryData from '@/composables/theoryData';
 import FlowDiagram from '@/components/FlowDiagram.vue';
 import ABCChorale from '@/classes/ABCChorale';
+import ReadMore from '@/components/ReadMore.vue';
 
 
 export default {
@@ -134,7 +133,7 @@ export default {
     });
     return { errors, scores, steps, currentStep, nextStep, previousStep, loadDifferentMelody };
   },
-  components: { FlowDiagram }
+  components: { FlowDiagram, ReadMore }
 }
 
 </script>
