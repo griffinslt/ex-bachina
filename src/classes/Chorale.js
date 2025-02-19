@@ -82,7 +82,7 @@ export default class Chorale {
             'measure', "attributes", "divisions", "key", "fifths", "mode", "time", "fermata", "notations",
             "beats", "beat-type", "clef", "sign", "line", "note", "pitch", "step", "octave", "duration",
             "type", "direction", "direction-type", "metronome", "beat-unit", "per-minute", "barline",
-            "rest", "bar-style", "backup", "accidental", "alter"
+            "rest", "bar-style", "backup", "accidental", "alter", "dot"
         ];
 
         const allElements = Array.from(this.xmlDoc.getElementsByTagName("*"));
@@ -115,7 +115,8 @@ export default class Chorale {
             var notes = this.notesFromBar(barContents);
             for (let i = 0; i < notes.length; i++) {
                 const pitch = this.pitchFromNote(notes[i]);
-                const myNote = new MyNote(null, null, pitch, notes[i].getType().contents[0], j);
+                const hasDot = typeof notes[i].contents[6][0] != "undefined";
+                const myNote = new MyNote(null, null, pitch, notes[i].getType().contents[0], j, hasDot);
                 myNotes.push(myNote);
             }
 
