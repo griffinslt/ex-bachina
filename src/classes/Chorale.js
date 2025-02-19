@@ -36,7 +36,7 @@ export default class Chorale {
             this.selectOtherChords();
             var containsNullsOrUndefineds = jsHelpers.pluck(this.noteList, 'chord').filter((val) => val == undefined || val == null);
             
-        } while (containsNullsOrUndefineds.length > 0 && repetitionCount > 10 );
+        } while (containsNullsOrUndefineds.length > 0 && repetitionCount < 100 );
     }
     getChoraleAsString() {
         // return new XMLSerializer().serializeToString(this.xmlDoc.documentElement)
