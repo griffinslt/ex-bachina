@@ -20,7 +20,72 @@ export default class ABCChorale {
 
     }
 
-    getLineBreaks() {
+    addPassingNotes(string) {
+        var stringAsArray = jsHelpers.splitElementsOfArray(string.split(" | "), " ");
+        stringAsArray[0].splice(0, 1);
+        stringAsArray[stringAsArray.length - 1].pop();
+
+        stringAsArray = string.split(" ");
+        const voiceDefinition = stringAsArray.splice(0, 1);
+        const doubleBarLine = stringAsArray.splice(stringAsArray.length - 1, 1);
+        console.log(stringAsArray);
+        var newString = voiceDefinition;
+
+        for (let i = 0; i <= stringAsArray.length - 2; i++) {
+            newString += " ";
+            if (stringAsArray[i] != "|" && stringAsArray[i] != "\n") {
+                var currentNoteVal = stringAsArray[i].charCodeAt(0)
+
+                var n = 1
+                while (stringAsArray[i + n] == "|" || stringAsArray[i + n] == "\n") {
+                    n++;
+                }
+                var nextNote = stringAsArray[i + n]
+
+                if (!/\d/.test(stringAsArray[i])) {
+                    if (nextNote != undefined) {
+
+
+
+
+                        if (currentNoteVal == nextNote.charCodeAt(0)) {
+                            if (currentNoteVal == 65) {
+                                currentNoteVal += 7
+                            }
+                            var temp = stringAsArray[i].slice(1)
+
+                            const newNote = String.fromCharCode(currentNoteVal - 1) + temp;
+                            newString += stringAsArray[i] + "1/2 " + newNote + "1/2 "
+                        }
+                        else if (currentNoteVal == (nextNote.charCodeAt(0) + 2)) {
+                            console.log(stringAsArray[i])
+                            var temp = stringAsArray[i].slice(1)
+                            const newNote = String.fromCharCode(currentNoteVal - 1) + temp;
+                            console.log(newNote)
+                            console.log(nextNote)
+                            newString += stringAsArray[i] + "1/2 " + newNote + "1/2 "
+
+                        } else {
+                            newString += stringAsArray[i];
+                        }
+                    } else {
+                        newString += stringAsArray[i];
+                    }
+
+                } else {
+                    newString += stringAsArray[i];
+                }
+
+
+
+            } else {
+                newString += stringAsArray[i];
+            }
+
+
+        }
+        return newString + stringAsArray[stringAsArray.length - 1] + doubleBarLine;
+
     }
 
     getString() {
@@ -104,13 +169,14 @@ export default class ABCChorale {
 
         }
 
-        this.abcString += altoLineString + "\n";
-        this.abcString += tenorLineString + "\n";
+        this.abcString += this.addPassingNotes(altoLineString) + "\n";
+        this.abcString += this.addPassingNotes(tenorLineString) + "\n";
 
 
 
 
     }
+
 
     selectAltoAndTenorNotes(note) {
         const sopranoNote = note.pitch.step;
@@ -144,7 +210,7 @@ export default class ABCChorale {
                 currentBar = note.barNumber;
                 numOfBars++;
                 if (numOfBars == this.linebreaks + 1) {
-                    bassLineString += "\n";
+                    bassLineString += " \n";
                 }
             }
             if (note.pitch != null) {
@@ -165,14 +231,15 @@ export default class ABCChorale {
                 bassLineString += numToAdd;
             }
             if (note.nextNote == null) {
-                bassLineString += "|]";
+                bassLineString += " |]";
             }
 
 
 
         }
 
-        this.abcString += bassLineString + "\n";
+
+        this.abcString += this.addPassingNotes(bassLineString) + "\n";
     }
 
     getBassNote(chord) {

@@ -27,4 +27,13 @@ const indexOfItemInElement = (arr, item) => {
     return -1;
 }
 
-export default { pluck, inlcudesArray, indexOfArray, randomise, indexOfItemInElement }
+const splitElementsOfArray = (arr, delimeter) => {
+    var newArr = []
+    for (const element of arr){
+        newArr.push(element.split(delimeter));
+    }
+    return newArr;
+}
+
+
+export default { pluck, inlcudesArray, indexOfArray, randomise, indexOfItemInElement, splitElementsOfArray }
