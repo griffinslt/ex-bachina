@@ -14,7 +14,6 @@ export default class ABCChorale {
         this.addOtherParts()
         const voice1Bars = this.findVoiceLine(1).split(" | ");
         this.linebreaks = jsHelpers.indexOfItemInElement(voice1Bars, "\n");
-        // console.log(voice1Bars)
         this.writeBassLine();
         this.writeAltoAndTenorParts();
 
@@ -35,8 +34,7 @@ export default class ABCChorale {
         var startSubstring = this.abcString.substring(0, startingIndex + stringToSearch.length + 1)
         const endSubstring = this.abcString.substring(startingIndex + stringToSearch.length + 1, this.abcString.length)
 
-        // startSubstring += "V2: treble\nV3: bass\nV4:bass\n";
-        startSubstring += "V:4 bass\n";
+        startSubstring += "V:2 alto\nV:3 tenor\nV:4 bass\n";
 
         this.abcString = startSubstring + endSubstring;
 
@@ -51,11 +49,88 @@ export default class ABCChorale {
         return stringPostStartingIndex.substring(0, stringPostStartingIndex.indexOf('|]'));
     }
 
+    removeSharpOrFlat(note) {
+        if (note.includes("#")) {
+            return note.slice(0, -1);
+        }
 
-    writeAltoAndTenorParts(){
+        return note;
+    }
+
+
+    writeAltoAndTenorParts() {
         var altoLineString = "V:2\n";
         var tenorLineString = "V:3\n";
+        var currentBar = 0;
+        var numOfBars = 0;
 
+        for (const note of this.noteList) {
+            if (currentBar < note.barNumber) {
+                altoLineString += " |";
+                tenorLineString += " |";
+                currentBar = note.barNumber;
+                numOfBars++;
+                if (numOfBars == this.linebreaks + 1) {
+                    altoLineString += "\n";
+                    tenorLineString += "\n";
+                }
+            }
+
+            if (note.pitch != null) {
+                const selectedNotes = this.selectAltoAndTenorNotes(note);
+                const altoNote = selectedNotes.alto;
+                const tenorNote = selectedNotes.tenor;
+                altoLineString += " " + altoNote;
+                tenorLineString += " " + tenorNote;
+            } else {
+                altoLineString += " z";
+                tenorLineString += " z";
+            }
+
+            if (note.type == "half") {
+                var numToAdd = 2;
+                if (note.dot) {
+                    numToAdd++;
+                }
+                altoLineString += numToAdd;
+                tenorLineString += numToAdd;
+            }
+            if (note.nextNote == null) {
+                altoLineString += "|]";
+                tenorLineString += "|]";
+            }
+
+
+
+        }
+
+        this.abcString += altoLineString + "\n";
+        this.abcString += tenorLineString + "\n";
+
+
+
+
+    }
+
+    selectAltoAndTenorNotes(note) {
+        const sopranoNote = note.pitch.step;
+        const bassnote = this.getBassNote(note.chord).replaceAll(",", "");
+        const formattedChord = this.chorale.separateInversion(note.chord);
+        const notesNotYetUsed = this.chorale.getTriadFromNumeral(formattedChord.numeral).filter(
+            (val) => val != sopranoNote && val != bassnote
+        );
+
+        if (notesNotYetUsed.length == 2) {
+            return {
+                alto: this.removeSharpOrFlat(notesNotYetUsed[0]),
+                tenor: this.removeSharpOrFlat(notesNotYetUsed[1]) + ","
+            }
+        } else {
+            return {
+                alto: this.removeSharpOrFlat(notesNotYetUsed[0]),
+                tenor: this.removeSharpOrFlat(jsHelpers.randomise(this.chorale.getTriadFromNumeral(formattedChord.numeral))[0]) + ","
+            }
+        }
 
     }
 
@@ -68,7 +143,7 @@ export default class ABCChorale {
                 bassLineString += " |";
                 currentBar = note.barNumber;
                 numOfBars++;
-                if (numOfBars == this.linebreaks+1) {
+                if (numOfBars == this.linebreaks + 1) {
                     bassLineString += "\n";
                 }
             }
@@ -78,14 +153,14 @@ export default class ABCChorale {
                     console.log(note)
                 }
 
-                bassLineString += " " + bassNote;
+                bassLineString += " " + this.removeSharpOrFlat(bassNote);
             } else {
-                bassLineString += " z"
+                bassLineString += " z";
             }
             if (note.type == "half") {
                 var numToAdd = 2;
                 if (note.dot) {
-                    numToAdd ++;
+                    numToAdd++;
                 }
                 bassLineString += numToAdd;
             }
@@ -93,19 +168,19 @@ export default class ABCChorale {
                 bassLineString += "|]";
             }
 
-            
+
 
         }
 
-        this.abcString += bassLineString;
+        this.abcString += bassLineString + "\n";
     }
 
-    getBassNote(chord, key) {
+    getBassNote(chord) {
         if (typeof chord == "undefined") {
             return; // sort this out
         }
         const formattedChord = this.chorale.separateInversion(chord);
-        const triad = this.chorale.getTriadFromNumeral(formattedChord.numeral, key);
+        const triad = this.chorale.getTriadFromNumeral(formattedChord.numeral);
         switch (formattedChord.inversion) {
             case "a":
                 return triad[0] + ",,";
