@@ -14,7 +14,7 @@
         <div id="audio" class=""></div>
         <div class="bg-light border rounded my-3 p-5 text-start">
           <p><strong>{{ steps[currentStep].title }}</strong></p>
-          <ReadMore :steps="steps[currentStep].content"/>
+          <ReadMore :steps="steps" :currentStep="currentStep" :key="componentKey"/>
         </div>
         <p class="text-start">
           <button @click="previousStep" class="btn btn-secondary">Back a Step</button> |
@@ -47,9 +47,10 @@ import ReadMore from '@/components/ReadMore.vue';
 
 export default {
   setup() {
+    const componentKey = ref(1);
+    const currentStep = ref(1);
     var chorale = null;
     const steps = theoryData.steps;
-    const currentStep = ref(1);
     const scores = ref([
       "253",
       // '254',
@@ -131,7 +132,12 @@ export default {
       scoreAsObject();
       showScore();
     });
-    return { errors, scores, steps, currentStep, nextStep, previousStep, loadDifferentMelody };
+
+    //force reload readmore component
+    watch(currentStep, () => {
+      componentKey.value++;
+    });
+    return { errors, scores, steps, currentStep, componentKey, nextStep, previousStep, loadDifferentMelody };
   },
   components: { FlowDiagram, ReadMore }
 }
