@@ -6,6 +6,8 @@ import jsHelpers from "@/jsHelpers";
 export default class Chorale {
     constructor(xmlDoc) {
         this.xmlDoc = xmlDoc;
+        this.cadenceChords = null;
+        this.melodicPatterns = null;
         this.cadenceLocations = [];
         this.startingKeySignature = { tonic: "", mode: "" };
         this.noteList = [];
@@ -15,7 +17,7 @@ export default class Chorale {
         this.computeFermataLocations()
         this.numOfBars = this.computeNumberOfBars();
         this.findKey();
-
+        
 
         this.musicXmlObj = MusicXML.parse(new XMLSerializer().serializeToString(this.xmlDoc.documentElement));
         this.parts = [
@@ -53,6 +55,18 @@ export default class Chorale {
 
     computeNumberOfBars() {
         return this.xmlDoc.getElementsByTagName('measure').length;
+    }
+
+    getKey(){
+        return this.startingKeySignature;
+    }
+
+    getCadenceChords(){
+        return this.cadenceChords;
+    }
+
+    getMelodicPatterns(){
+        return this.melodicPatterns;
     }
 
 
@@ -148,6 +162,7 @@ export default class Chorale {
 
     addCadenceChordsToNotes() {
         const cadenceChords = this.chooseCadences();
+        this.cadenceChords = cadenceChords;
         for (let i = 0; i < this.cadenceLocations.length; i++) {
             const notesFromBar = this.noteList.filter(note => note.barNumber == this.cadenceLocations[i].barNumber);
             const cadenceNote = notesFromBar[this.cadenceLocations[i].noteNumber];
@@ -217,10 +232,12 @@ export default class Chorale {
 
         }
         this.currentKey = currentKey;
-
+        this.melodicPatterns = [];
         var previousCadences = [];
         for (const cadenceLocation of this.cadenceLocations) {
             const melodicPatternForCadence = this.getThreeCadenceNotes(part1Bars, cadenceLocation, currentKey);
+            this.melodicPatterns.push([melodicPatternForCadence]);
+            console.log(melodicPatternForCadence)
             const possibleCadenceHere = this.getPossibleCadences(melodicPatternForCadence); // if there is no possible cadence then maybe it is a sign to modulate
             if (possibleCadenceHere.length == 0) {
                 previousCadences.push("No cadences found");
@@ -370,7 +387,7 @@ export default class Chorale {
 
 
             //find out what note it is in relation to our key
-            let thirdNotePositionInScale = this.getNotePositionInScale(thirdNote, currentKey);
+            const thirdNotePositionInScale = this.getNotePositionInScale(thirdNote, currentKey);
             // get the second note
             var secondNote = null;
             var barNumber = cadenceLocation.barNumber;

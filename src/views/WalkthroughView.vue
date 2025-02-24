@@ -43,14 +43,17 @@ import theoryData from '@/composables/theoryData';
 import FlowDiagram from '@/components/FlowDiagram.vue';
 import ABCChorale from '@/classes/ABCChorale';
 import ReadMore from '@/components/ReadMore.vue';
+import jsHelpers from '@/jsHelpers';
 
 
 export default {
   setup() {
     const componentKey = ref(1);
-    const currentStep = ref(1);
+    const currentStep = ref(0);
     var chorale = null;
-    const steps = theoryData.steps;
+    const steps = ref(theoryData.steps);
+    const stepsCopy = theoryData.steps;
+    const contextSteps = ref(null);
     const scores = ref([
       "253",
       // '254',
@@ -75,8 +78,8 @@ export default {
         errors.value.push(error.value);
       }
       // console.log(text.value)
-      const abcChorale = new ABCChorale(text.value, chorale)
-      text.value = abcChorale.getString();
+      // const abcChorale = new ABCChorale(text.value, chorale)
+      // text.value = abcChorale.getString();
       var visualObj = renderAbc("target", text.value);
       // code for playback
       var abcOptions = { add_classes: true };
@@ -108,7 +111,7 @@ export default {
       }
     };
     const nextStep = () => {
-      if (currentStep.value < steps.length - 1) {
+      if (currentStep.value < steps.value.length - 1) {
         currentStep.value++;
       }
     };
@@ -135,9 +138,33 @@ export default {
 
     //force reload readmore component
     watch(currentStep, () => {
+      steps.value = stepsCopy;
       componentKey.value++;
+      if (currentStep.value == 1) {
+        const key = chorale.getKey();
+        contextSteps.value = ["In this this case, the key is " + key.tonic + " " + key.mode];
+      } else if (currentStep.value == 2) {
+
+        const cadenceLocations = chorale.getCadenceLocations();
+        contextSteps.value = ["In this case there are  " + cadenceLocations.length + " cadences. These can be found in the following locations: "];
+        for (const cadence of cadenceLocations){
+          contextSteps.value.push("Bar " + cadence.barNumber + " note " + (cadence.noteNumber + 1))
+        }
+        
+      } else if (currentStep.value == 3) {
+        // choose cadence chords
+
+        console.log(chorale.getMelodicPatterns());
+        console.log(chorale.getCadenceChords());
+      }
+      console.log(jsHelpers.pluck(chorale.noteList, 'chord'))
+      
+      // add contextual steps to the steps to be displayed
+      for (const step of contextSteps.value){
+        steps.value[currentStep.value].content.push(step);
+      }
     });
-    return { errors, scores, steps, currentStep, componentKey, nextStep, previousStep, loadDifferentMelody };
+    return { errors, scores, steps, currentStep, componentKey, contextSteps, nextStep, previousStep, loadDifferentMelody };
   },
   components: { FlowDiagram, ReadMore }
 }
