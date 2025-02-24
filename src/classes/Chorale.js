@@ -8,7 +8,9 @@ export default class Chorale {
         this.xmlDoc = xmlDoc;
         this.cadenceChords = null;
         this.melodicPatterns = null;
+        this.possibleCadences = [];
         this.cadenceLocations = [];
+        this.selectedCadences = [];
         this.startingKeySignature = { tonic: "", mode: "" };
         this.noteList = [];
         this.timeSignature = { numerator: 4, denominator: 4 };
@@ -67,6 +69,10 @@ export default class Chorale {
 
     getMelodicPatterns(){
         return this.melodicPatterns;
+    }
+
+    getPossibleCadences(){
+        return this.possibleCadences;
     }
 
 
@@ -236,13 +242,14 @@ export default class Chorale {
         var previousCadences = [];
         for (const cadenceLocation of this.cadenceLocations) {
             const melodicPatternForCadence = this.getThreeCadenceNotes(part1Bars, cadenceLocation, currentKey);
-            this.melodicPatterns.push([melodicPatternForCadence]);
-            console.log(melodicPatternForCadence)
+            this.melodicPatterns.push(Array.from(melodicPatternForCadence))
             const possibleCadenceHere = this.getPossibleCadences(melodicPatternForCadence); // if there is no possible cadence then maybe it is a sign to modulate
             if (possibleCadenceHere.length == 0) {
                 previousCadences.push("No cadences found");
             } else {
+                this.possibleCadences.push(Array.from(possibleCadenceHere));
                 const selectedCadence = this.selectCadence(previousCadences, possibleCadenceHere);
+                this.selectedCadences.push(selectedCadence);
                 previousCadences.push(selectedCadence);
             }
         }

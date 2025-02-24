@@ -154,10 +154,38 @@ export default {
       } else if (currentStep.value == 3) {
         // choose cadence chords
 
-        console.log(chorale.getMelodicPatterns());
-        console.log(chorale.getCadenceChords());
+
+        contextSteps.value = [];
+      
+        for (let i = 0; i < chorale.getMelodicPatterns().length; i++) {
+          var stepString = "For cadence number " + (i + 1) + " the melodic pattern is ";
+          for (const element of chorale.getMelodicPatterns()[i]){
+            stepString +=  element + "-";
+          }
+          stepString = stepString.slice(0, -1) + ". This means that the possible chords are ";
+          console.log(chorale.possibleCadences[i])
+          for (const cadence of chorale.possibleCadences[i]){
+            for (const chord of cadence){
+              stepString += chord + "-";
+            }
+            stepString = stepString.slice(0, -1) + " or ";
+          }
+          stepString = stepString.slice(0, -4) + ". "
+          
+          for (const chord of chorale.selectedCadences[i]){
+            stepString += chord + "-";
+            
+          }
+          stepString = stepString.slice(0, -1) + " has been selected.";
+          contextSteps.value.push(stepString);
+          }
+          
+
+        
+        
+
       }
-      console.log(jsHelpers.pluck(chorale.noteList, 'chord'))
+      // console.log(jsHelpers.pluck(chorale.noteList, 'chord'))
       
       // add contextual steps to the steps to be displayed
       for (const step of contextSteps.value){
