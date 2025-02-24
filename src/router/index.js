@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import WalkthroughView from '../views/WalkthroughView.vue'
 import Steps from '../views/StepsView.vue'
 
 const router = createRouter({
@@ -7,8 +7,8 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: HomeView
+      name: 'walkthrough',
+      component: WalkthroughView
     },
     {
       path: '/steps',
