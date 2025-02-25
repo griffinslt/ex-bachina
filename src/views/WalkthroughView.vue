@@ -13,9 +13,9 @@
         <div id="target"></div>
         <div id="audio" class=""></div>
         <div class="bg-light border rounded my-3 p-5 text-start">
-          <p><strong>{{ currentStep }}</strong></p>
           <p><strong>{{ steps[currentStep].title }}</strong></p>
           <ReadMore :steps="steps" :currentStep="currentStep" :key="componentKey"/>
+          <button class="btn btn-danger" v-if="currentStep == 6" @click="backToStart">Back To Start</button>
         </div>
         <p class="text-start">
           <button @click="previousStep" class="btn btn-secondary">Back a Step</button> |
@@ -135,6 +135,14 @@ export default {
       chorale = new Chorale(xmlDoc);
       xmlString.value = chorale.getChoraleAsString();
     };
+
+    const backToStart = async () => {
+      for (let i = 0; i < 6; i++) {
+        currentStep.value--;
+        await new Promise((resolve) => setTimeout(resolve, 0.1 * 1000));
+      }
+    }
+
     // waits until the file is read
     watch(string, () => {
       scoreAsObject();
@@ -244,7 +252,7 @@ export default {
         steps.value[currentStep.value].content.push(step);
       }
     });
-    return { errors, scores, steps, currentStep, componentKey, contextSteps, nextStep, previousStep, loadDifferentMelody };
+    return { errors, scores, steps, currentStep, componentKey, contextSteps, nextStep, previousStep, loadDifferentMelody, backToStart };
   },
   components: { FlowDiagram, ReadMore }
 }
