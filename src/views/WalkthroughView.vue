@@ -13,6 +13,7 @@
         <div id="target"></div>
         <div id="audio" class=""></div>
         <div class="bg-light border rounded my-3 p-5 text-start">
+          <p><strong>{{ currentStep }}</strong></p>
           <p><strong>{{ steps[currentStep].title }}</strong></p>
           <ReadMore :steps="steps" :currentStep="currentStep" :key="componentKey"/>
         </div>
@@ -75,12 +76,6 @@ export default {
       errors.value.push(error);
     }
     const showScore = () => {
-      
-      
-      
-      // console.log(text.value)
-      // const abcChorale = new ABCChorale(text.value, chorale)
-      // text.value = abcChorale.getString();
       var visualObj = renderAbc("target", abcText.value);
       // code for playback
       var abcOptions = { add_classes: true };
@@ -139,7 +134,6 @@ export default {
       const xmlDoc = new DOMParser().parseFromString(string.value, "text/xml");
       chorale = new Chorale(xmlDoc);
       xmlString.value = chorale.getChoraleAsString();
-      // console.log(xmlString.value);
     };
     // waits until the file is read
     watch(string, () => {
@@ -215,11 +209,33 @@ export default {
 
       } else if (currentStep.value == 5){
         contextSteps.value = [];
-        abcChorale = new ABCChorale(abcText.value, chorale)
-        abcChorale.writeBassLine();
-        abcText.value = abcChorale.getString();
+        if (abcChorale == null){
+          abcChorale = new ABCChorale(abcText.value, chorale)
+        }
+
+        if (abcChorale.findVoiceLine(4) == null) {
+          abcChorale.writeBassLine();
+          abcText.value = abcChorale.getString();
+        }
+        
+        if (abcChorale.findVoiceLine(2) != null || abcChorale.findVoiceLine(3) != null) {
+          abcChorale.removeAltoAndTenorLines();
+          abcText.value = abcChorale.getString();
+        }
         showScore();
+
+
+      } else if (currentStep.value == 6){
+        contextSteps.value = [];
+
+        if (abcChorale.findVoiceLine(2) == null && abcChorale.findVoiceLine(3) == null) {
+          abcChorale.writeAltoAndTenorParts();
+          abcText.value = abcChorale.getString();
+          showScore();
+        }
       }
+
+
 
       
       

@@ -11,7 +11,7 @@ export default class ABCChorale {
     }
 
     run() {
-        this.addOtherParts()
+        // this.bassPart();//
         const voice1Bars = this.findVoiceLine(1).split(" | ");
         this.linebreaks = jsHelpers.indexOfItemInElement(voice1Bars, "\n");
         // this.writeBassLine();
@@ -26,7 +26,6 @@ export default class ABCChorale {
         stringAsArray = string.split(" ");
         const voiceDefinition = stringAsArray.splice(0, 1);
         const doubleBarLine = stringAsArray.splice(stringAsArray.length - 1, 1);
-        console.log(stringAsArray);
         var newString = voiceDefinition;
 
         for (let i = 0; i <= stringAsArray.length - 2; i++) {
@@ -51,11 +50,8 @@ export default class ABCChorale {
                             newString += stringAsArray[i] + "1/2 " + newNote + "1/2 "
                         }
                         else if (currentNoteVal == (nextNote.charCodeAt(0) + 2)) {
-                            console.log(stringAsArray[i])
                             var temp = stringAsArray[i].slice(1)
                             const newNote = String.fromCharCode(currentNoteVal - 1) + temp;
-                            console.log(newNote)
-                            console.log(nextNote)
                             newString += stringAsArray[i] + "1/2 " + newNote + "1/2 "
 
                         } else {
@@ -79,29 +75,33 @@ export default class ABCChorale {
     }
 
     getString() {
-        console.log(this.abcString)
         return this.abcString;
     }
 
-    addOtherParts() {
+    addBassPart() {
         const stringToSearch = "V:1 treble ";
-        console.log(this.abcString)
         const startingIndex = this.abcString.indexOf(stringToSearch);
         var startSubstring = this.abcString.substring(0, startingIndex + stringToSearch.length + 1)
         const endSubstring = this.abcString.substring(startingIndex + stringToSearch.length + 1, this.abcString.length)
-
-        // startSubstring += "V:2 alto\nV:3 tenor\nV:4 bass\n";
         startSubstring += "V:4 bass\n";
 
         this.abcString = startSubstring + endSubstring;
+    }
+    addAltoAndTenorParts() {
+        const stringToSearch = "V:1 treble ";
+        const startingIndex = this.abcString.indexOf(stringToSearch);
+        var startSubstring = this.abcString.substring(0, startingIndex + stringToSearch.length + 1)
+        const endSubstring = this.abcString.substring(startingIndex + stringToSearch.length + 1, this.abcString.length)
+        startSubstring += "V:2 treble\nV:3 bass\n";
 
-
-
+        this.abcString = startSubstring + endSubstring;
     }
 
     findVoiceLine(num) {
-        // console.log(this.abcString)
         const startingIndex = this.abcString.indexOf("V:" + num + "\n") + 4;
+        if (startingIndex == 3) {
+            return null
+        }
         const stringPostStartingIndex = this.abcString.substring(startingIndex, this.abcString.length);
         return stringPostStartingIndex.substring(0, stringPostStartingIndex.indexOf('|]') + 2);
     }
@@ -116,6 +116,7 @@ export default class ABCChorale {
 
 
     writeAltoAndTenorParts() {
+        this.addAltoAndTenorParts();
         var altoLineString = "V:2\n";
         var tenorLineString = "V:3\n";
         var currentBar = 0;
@@ -194,9 +195,21 @@ export default class ABCChorale {
         this.abcString = this.abcString.replace("\nV:4\n", "");
         this.abcString = this.abcString.replace("V:4 bass\n", "");
     }
+    removeAltoAndTenorLines(){
+        const altoLine = this.findVoiceLine(2);
+        const tenorLine = this.findVoiceLine(3);
+        this.abcString = this.abcString.replace(altoLine, "");
+        this.abcString = this.abcString.replace("\nV:2\n", "");
+        this.abcString = this.abcString.replace("V:2 treble\n", "");
+
+        this.abcString = this.abcString.replace(tenorLine, "");
+        this.abcString = this.abcString.replace("\nV:3\n", "");
+        this.abcString = this.abcString.replace("V:3 bass\n", "");
+    }
     
 
     writeBassLine() {
+        this.addBassPart();
         var bassLineString = "V:4\n";
         var currentBar = 0;
         var numOfBars = 0;
