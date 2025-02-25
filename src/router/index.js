@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import WalkthroughView from '../views/WalkthroughView.vue'
 import Steps from '../views/StepsView.vue'
+import InteractiveStaveView from '@/views/InteractiveStaveView.vue'
+import GenerateView from '@/views/GenerateView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,6 +16,16 @@ const router = createRouter({
       path: '/steps',
       name: 'steps',
       component: Steps
+    },
+    {
+      path: '/interactive-stave',
+      name: 'interactive-stave',
+      component: InteractiveStaveView
+    },
+    {
+      path: '/generate',
+      name: 'generate',
+      component: GenerateView
     },
   ]
 })
