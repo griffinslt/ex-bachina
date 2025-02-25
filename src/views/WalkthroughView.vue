@@ -54,6 +54,7 @@ export default {
     const steps = ref(theoryData.steps);
     const stepsCopy = theoryData.steps;
     const contextSteps = ref(null);
+    var abcChorale = null;
     const scores = ref([
       "253",
       // '254',
@@ -62,25 +63,25 @@ export default {
       "291",
       "438",
     ]);
+    const abcText = ref(null)
     const currentScore = ref(scores.value[2]);
     const errors = ref([]);
     // const { string, error, load } = getXMLAsString('/scores/BWV_0' + currentScore.value + '.xml')
     const { string, error, load } = getXMLAsString("/scores/BWV_0" + currentScore.value + ".xml");
     const xmlString = ref(string.value);
+    
     load();
     if (error.value) {
       errors.value.push(error);
     }
     const showScore = () => {
-      const { text, error, convert } = xmlToAbc(xmlString.value);
-      convert();
-      if (error.value) {
-        errors.value.push(error.value);
-      }
+      
+      
+      
       // console.log(text.value)
       // const abcChorale = new ABCChorale(text.value, chorale)
       // text.value = abcChorale.getString();
-      var visualObj = renderAbc("target", text.value);
+      var visualObj = renderAbc("target", abcText.value);
       // code for playback
       var abcOptions = { add_classes: true };
       var audioParams = { chordsOff: true };
@@ -110,6 +111,16 @@ export default {
           "Audio is not supported in this browser.";
       }
     };
+
+    const getABCString = () => {
+      const { text, error, convert } = xmlToAbc(xmlString.value);
+      convert();
+      abcText.value = text.value;
+      if (error.value) {
+        errors.value.push(error.value);
+      }
+    }
+
     const nextStep = () => {
       if (currentStep.value < steps.value.length - 1) {
         currentStep.value++;
@@ -133,8 +144,10 @@ export default {
     // waits until the file is read
     watch(string, () => {
       scoreAsObject();
+      getABCString();
       showScore();
     });
+
 
     //force reload readmore component
     watch(currentStep, () => {
@@ -163,14 +176,13 @@ export default {
             stepString +=  element + "-";
           }
           stepString = stepString.slice(0, -1) + ". This means that the possible chords are ";
-          console.log(chorale.possibleCadences[i])
           for (const cadence of chorale.possibleCadences[i]){
             for (const chord of cadence){
               stepString += chord + "-";
             }
             stepString = stepString.slice(0, -1) + " or ";
           }
-          stepString = stepString.slice(0, -4) + ". "
+          stepString = stepString.slice(0, -4) + ". ";
           
           for (const chord of chorale.selectedCadences[i]){
             stepString += chord + "-";
@@ -178,14 +190,38 @@ export default {
           }
           stepString = stepString.slice(0, -1) + " has been selected.";
           contextSteps.value.push(stepString);
-          }
+        }
+        
+        
+        
+        
+        
+      } else if (currentStep.value == 4){
+        contextSteps.value = [];
+        var stepString = "The chords selected here are "
+        
+        for (const chord of jsHelpers.pluck(chorale.noteList, 'chord')){
+          stepString += chord + "-";
+        }
+        stepString = stepString.slice(0, -1) + ".";
+        contextSteps.value.push(stepString);
+
+        if (abcChorale != null) {
+          abcChorale.removeBassLine();
+          abcText.value = abcChorale.getString();
+          showScore();
           
+        }
 
-        
-        
-
+      } else if (currentStep.value == 5){
+        contextSteps.value = [];
+        abcChorale = new ABCChorale(abcText.value, chorale)
+        abcChorale.writeBassLine();
+        abcText.value = abcChorale.getString();
+        showScore();
       }
-      // console.log(jsHelpers.pluck(chorale.noteList, 'chord'))
+
+      
       
       // add contextual steps to the steps to be displayed
       for (const step of contextSteps.value){

@@ -14,8 +14,8 @@ export default class ABCChorale {
         this.addOtherParts()
         const voice1Bars = this.findVoiceLine(1).split(" | ");
         this.linebreaks = jsHelpers.indexOfItemInElement(voice1Bars, "\n");
-        this.writeBassLine();
-        this.writeAltoAndTenorParts();
+        // this.writeBassLine();
+        // this.writeAltoAndTenorParts();
     }
 
     addPassingNotes(string) {
@@ -85,11 +85,13 @@ export default class ABCChorale {
 
     addOtherParts() {
         const stringToSearch = "V:1 treble ";
+        console.log(this.abcString)
         const startingIndex = this.abcString.indexOf(stringToSearch);
         var startSubstring = this.abcString.substring(0, startingIndex + stringToSearch.length + 1)
         const endSubstring = this.abcString.substring(startingIndex + stringToSearch.length + 1, this.abcString.length)
 
-        startSubstring += "V:2 alto\nV:3 tenor\nV:4 bass\n";
+        // startSubstring += "V:2 alto\nV:3 tenor\nV:4 bass\n";
+        startSubstring += "V:4 bass\n";
 
         this.abcString = startSubstring + endSubstring;
 
@@ -101,7 +103,7 @@ export default class ABCChorale {
         // console.log(this.abcString)
         const startingIndex = this.abcString.indexOf("V:" + num + "\n") + 4;
         const stringPostStartingIndex = this.abcString.substring(startingIndex, this.abcString.length);
-        return stringPostStartingIndex.substring(0, stringPostStartingIndex.indexOf('|]'));
+        return stringPostStartingIndex.substring(0, stringPostStartingIndex.indexOf('|]') + 2);
     }
 
     removeSharpOrFlat(note) {
@@ -185,6 +187,14 @@ export default class ABCChorale {
         }
 
     }
+
+    removeBassLine(){
+        const bassline = this.findVoiceLine(4);
+        this.abcString = this.abcString.replace(bassline, "");
+        this.abcString = this.abcString.replace("\nV:4\n", "");
+        this.abcString = this.abcString.replace("V:4 bass\n", "");
+    }
+    
 
     writeBassLine() {
         var bassLineString = "V:4\n";
