@@ -2,7 +2,12 @@ const steps =
     [
         {
             title: "Introduction",
-            content: ["Point 1", "Point 2", "Point 3"]
+            content: ["Welcome to the walkthough.",
+                "Navigate with the below buttons to learn the process of harmonising a chorale.",
+                "Feel free to press the above play button to hear the music play back, though that is not necessary to understand the process.",
+                "It may also be worth to glance at the flow diagram to get an overview of the whole process."
+            
+            ]
         },
         {
             title: "Calculate Key",
@@ -31,11 +36,16 @@ const steps =
         },
         {
             title: "Selecting other chords",
-            content: []
+            content: [
+                "Follow the flow diagram of chords filling and choose a sequence that fits both the diagram and the notes in the melody."
+            ]
         },
         {
             title: "Select bass notes",
-            content: []
+            content: [
+                "Bass notes are easy to select they are just the bottom note from the chord selected in the previous step.",
+                "Passing notes, which are notes between chord progressions can be added to the bass here when there is one 2 steps between one bass note and another."
+            ]
         },
         {
             title: "Select alto and tenor notes",
