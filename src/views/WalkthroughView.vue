@@ -17,7 +17,7 @@
           <ReadMore :steps="steps" :currentStep="currentStep" :key="componentKey"/>
           <p  v-if="currentStep == 4">
             <button class="btn btn-info" @click="">Chord Progression Flow Chart</button> | 
-            <button class="btn btn-info" @click="">Chord Table</button>
+            <button class="btn btn-info" @click="toggleModal">Chord Table</button>
           </p>
           <button class="btn btn-danger" v-if="currentStep == 6" @click="backToStart">Back To Start</button>
         </div>
@@ -27,14 +27,18 @@
           <button @click="loadDifferentMelody" class="btn btn-info">Load a Different Melody</button>
         </p>
       </div>
-
+      
     </div>
     <div class="col">
       <FlowDiagram />
     </div>
   </div>
-
-
+  <div v-if="showChordTable">
+    <Modal @close="toggleModal">
+      <ChordTable :choraleKey="choraleKey"/>
+    </Modal>
+  </div>
+    
 </template>
 
 <script>
@@ -49,17 +53,22 @@ import FlowDiagram from '@/components/FlowDiagram.vue';
 import ABCChorale from '@/classes/ABCChorale';
 import ReadMore from '@/components/ReadMore.vue';
 import jsHelpers from '@/jsHelpers';
+import Modal from '@/components/Modal.vue';
+import ChordTable from '../components/ChordTable.vue';
 
 
 export default {
   setup() {
+    const showChordTable = ref(false)
     const componentKey = ref(1);
     const currentStep = ref(0);
+    const choraleKey = ref(null);
     var chorale = null;
     const steps = ref(theoryData.steps);
     const stepsCopy = theoryData.steps;
     const contextSteps = ref(null);
     var abcChorale = null;
+
     const scores = ref([
       "253",
       // '254',
@@ -147,6 +156,10 @@ export default {
       }
     }
 
+    const toggleModal = () =>{
+      showChordTable.value = !showChordTable.value;
+    }
+
     // waits until the file is read
     watch(string, () => {
       scoreAsObject();
@@ -161,6 +174,7 @@ export default {
       componentKey.value++;
       if (currentStep.value == 1) {
         const key = chorale.getKey();
+        choraleKey.value=key;
         contextSteps.value = ["In this this case, the key is " + key.tonic + " " + key.mode];
       } else if (currentStep.value == 2) {
 
@@ -258,9 +272,9 @@ export default {
         steps.value[currentStep.value].content.push(step);
       }
     });
-    return { errors, scores, steps, currentStep, componentKey, contextSteps, nextStep, previousStep, loadDifferentMelody, backToStart };
+    return { errors, scores, steps, currentStep, componentKey, contextSteps, showChordTable, choraleKey, nextStep, previousStep, loadDifferentMelody, backToStart, toggleModal };
   },
-  components: { FlowDiagram, ReadMore }
+  components: { FlowDiagram, ReadMore, Modal, ChordTable }
 }
 
 </script>
