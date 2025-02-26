@@ -1,10 +1,10 @@
 <template>
 
     <ul v-for="(point, index) in steps" :key="index">
-        <li v-if="showContent || index < 3">{{ point }}</li>
+        <li v-if="showContent || index < 4">{{ point }}</li>
     </ul>
-    <span class="btn btn-link" @click="toggleContent" v-if="!showContent && steps.length > 3">Read More</span>
-    <span class="btn btn-link" @click="toggleContent" v-if="showContent && steps.length > 2">Read Less</span>
+    <span class="btn btn-link" @click="toggleContent" v-if="!showContent && steps.length > 4">Read More</span>
+    <span class="btn btn-link" @click="toggleContent" v-if="showContent && steps.length > 3">Read Less</span>
 </template>
 
 
