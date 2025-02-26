@@ -15,6 +15,10 @@
         <div class="bg-light border rounded my-3 p-5 text-start">
           <p><strong>{{ steps[currentStep].title }}</strong></p>
           <ReadMore :steps="steps" :currentStep="currentStep" :key="componentKey"/>
+          <p  v-if="currentStep == 4">
+            <button class="btn btn-info" @click="">Chord Progression Flow Chart</button> | 
+            <button class="btn btn-info" @click="">Chord Table</button>
+          </p>
           <button class="btn btn-danger" v-if="currentStep == 6" @click="backToStart">Back To Start</button>
         </div>
         <p class="text-start">
@@ -241,6 +245,8 @@ export default {
           abcText.value = abcChorale.getString();
           showScore();
         }
+      } else {
+        contextSteps.value = [];
       }
 
 
