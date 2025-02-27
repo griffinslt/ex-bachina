@@ -51,6 +51,12 @@ const steps =
             title: "Select alto and tenor notes",
             content: []
         },
+        {
+            title: "End",
+            content: [
+                "The chorale is now harmonised, feel free to listen back to hear the changes."
+            ]
+        },
 
     ]
 

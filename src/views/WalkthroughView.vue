@@ -19,7 +19,7 @@
             <button class="btn btn-info" @click="toggleChordDiagram">Chord Progression Flow Chart</button> | 
             <button class="btn btn-info" @click="toggleChordTable">Chord Table</button>
           </p>
-          <button class="btn btn-danger" v-if="currentStep == 6" @click="backToStart">Back To Start</button>
+          <button class="btn btn-danger" v-if="currentStep == 7" @click="backToStart">Back To Start</button>
         </div>
         <p class="text-start">
           <button @click="previousStep" class="btn btn-secondary">Back a Step</button> |
@@ -158,7 +158,7 @@ export default {
     };
 
     const backToStart = async () => {
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < 7; i++) {
         currentStep.value--;
         await new Promise((resolve) => setTimeout(resolve, 0.1 * 1000));
       }
