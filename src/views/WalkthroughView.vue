@@ -16,8 +16,8 @@
           <p><strong>{{ steps[currentStep].title }}</strong></p>
           <ReadMore :steps="steps" :currentStep="currentStep" :key="componentKey"/>
           <p  v-if="currentStep == 4">
-            <button class="btn btn-info" @click="">Chord Progression Flow Chart</button> | 
-            <button class="btn btn-info" @click="toggleModal">Chord Table</button>
+            <button class="btn btn-info" @click="toggleChordDiagram">Chord Progression Flow Chart</button> | 
+            <button class="btn btn-info" @click="toggleChordTable">Chord Table</button>
           </p>
           <button class="btn btn-danger" v-if="currentStep == 6" @click="backToStart">Back To Start</button>
         </div>
@@ -34,8 +34,14 @@
     </div>
   </div>
   <div v-if="showChordTable">
-    <Modal @close="toggleModal">
+    <Modal @close="toggleChordTable">
       <ChordTable :choraleKey="choraleKey"/>
+    </Modal>
+  </div>
+  <div v-if="showChordDiagram">
+    <Modal @close="toggleChordDiagram">
+      <h5>Chord Progression Flow Chart</h5>
+      <img src="/chord_progressions.svg" />
     </Modal>
   </div>
     
@@ -60,6 +66,7 @@ import ChordTable from '../components/ChordTable.vue';
 export default {
   setup() {
     const showChordTable = ref(false)
+    const showChordDiagram = ref(false)
     const componentKey = ref(1);
     const currentStep = ref(0);
     const choraleKey = ref(null);
@@ -156,8 +163,11 @@ export default {
       }
     }
 
-    const toggleModal = () =>{
+    const toggleChordTable = () =>{
       showChordTable.value = !showChordTable.value;
+    }
+    const toggleChordDiagram = () =>{
+      showChordDiagram.value = !showChordDiagram.value;
     }
 
     // waits until the file is read
@@ -272,7 +282,7 @@ export default {
         steps.value[currentStep.value].content.push(step);
       }
     });
-    return { errors, scores, steps, currentStep, componentKey, contextSteps, showChordTable, choraleKey, nextStep, previousStep, loadDifferentMelody, backToStart, toggleModal };
+    return { errors, scores, steps, currentStep, componentKey, contextSteps, showChordTable, showChordDiagram, choraleKey, nextStep, previousStep, loadDifferentMelody, backToStart, toggleChordTable, toggleChordDiagram };
   },
   components: { FlowDiagram, ReadMore, Modal, ChordTable }
 }
