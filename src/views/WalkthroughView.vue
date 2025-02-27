@@ -29,8 +29,9 @@
       </div>
       
     </div>
-    <div class="col">
-      <FlowDiagram />
+    <div class="col text-center">
+      <br>
+      <FlowDiagram :currentStep="currentStep" :key="componentKey"/>
     </div>
   </div>
   <div v-if="showChordTable">
