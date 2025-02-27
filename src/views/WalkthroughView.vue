@@ -72,7 +72,7 @@ export default {
     const choraleKey = ref(null);
     var chorale = null;
     const steps = ref(theoryData.steps);
-    const stepsCopy = theoryData.steps;
+    const stepsCopy = JSON.parse(JSON.stringify(steps.value));
     const contextSteps = ref(null);
     var abcChorale = null;
 
@@ -180,8 +180,14 @@ export default {
 
     //force reload readmore component
     watch(currentStep, () => {
-      steps.value = stepsCopy;
       componentKey.value++;
+      steps.value = JSON.parse(JSON.stringify(stepsCopy));
+      contextSteps.value = [];
+
+      console.log(steps.value)
+      console.log(stepsCopy)
+
+      
       if (currentStep.value == 1) {
         const key = chorale.getKey();
         choraleKey.value=key;
@@ -273,10 +279,6 @@ export default {
         contextSteps.value = [];
       }
 
-
-
-      
-      
       // add contextual steps to the steps to be displayed
       for (const step of contextSteps.value){
         steps.value[currentStep.value].content.push(step);
