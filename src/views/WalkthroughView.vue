@@ -61,7 +61,7 @@ import ABCChorale from '@/classes/ABCChorale';
 import ReadMore from '@/components/ReadMore.vue';
 import jsHelpers from '@/jsHelpers';
 import Modal from '@/components/Modal.vue';
-import ChordTable from '../components/ChordTable.vue';
+import ChordTable from '@/components/ChordTable.vue';
 
 
 export default {
@@ -89,7 +89,7 @@ export default {
     const currentScore = ref(scores.value[2]);
     const errors = ref([]);
     // const { string, error, load } = getXMLAsString('/scores/BWV_0' + currentScore.value + '.xml')
-    const { string, error, load } = getXMLAsString("/scores/BWV_0" + currentScore.value + ".xml");
+    const { string, error, load } = getXMLAsString("/ex-bachina/scores/BWV_0" + currentScore.value + ".xml");
     const xmlString = ref(string.value);
     
     load();
