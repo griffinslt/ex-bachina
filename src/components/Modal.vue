@@ -1,6 +1,6 @@
 <template>
-    <div style="top: 0;position: fixed;background: rgba(0, 0, 0, 0.5);width: 100%;height: 100%;" class=" d-flex justify-content-center"  @click="$emit('close')">
-        <div class="card my-5 p-2 text-center" style="min-width: 500px; height: 60%;"  @click="$emit('close')">
+    <div style="background: rgba(0, 0, 0, 0.5);" class="d-flex justify-content-center full-width"  @click="$emit('close')">
+        <div class="card my-5 p-2 text-center" style="min-width: 500px; height: 50%;"  @click="$emit('close')">
             <slot>
 
             </slot>
@@ -23,5 +23,17 @@ export default {
 
 
 <style>
-
+.full-width {
+    width: 100vw;
+    height: 100vw;
+    position: fixed;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    top: 50%;
+    bottom: 50%;
+    margin-top: -30vw;
+    margin-bottom: -50vw;
+}
 </style>
