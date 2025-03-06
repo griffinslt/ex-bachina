@@ -4,6 +4,7 @@ import { Chord, Key } from "tonal";
 export default class ABCChorale {
     constructor(abcString, chorale) {
         this.abcString = abcString;
+        this.abcNotes = this.getOrderOfNotes();
         this.noteList = chorale.getNoteList();
         this.chorale = chorale;
         this.linebreaks = null;
@@ -16,6 +17,22 @@ export default class ABCChorale {
         this.linebreaks = jsHelpers.indexOfItemInElement(voice1Bars, "\n");
         // this.writeBassLine();
         // this.writeAltoAndTenorParts();
+    }
+
+    getOrderOfNotes(){
+        var notes = new Array();
+        for (let i = 0; i < 28; i++) {
+            var note = String.fromCharCode(i % 7 + 65);
+            if (i < 7) {
+                note += ",,";
+            } else if (i < 14){
+                note += ",";
+            } else if (i > 20){
+                note = note.toLowerCase();
+            }
+            notes.push(note)
+        }
+        return notes;
     }
 
     addPassingNotes(string) {
@@ -121,6 +138,7 @@ export default class ABCChorale {
         var tenorLineString = "V:3\n";
         var currentBar = 0;
         var numOfBars = 0;
+        var previousNote = null;
 
         for (const note of this.noteList) {
             if (currentBar < note.barNumber) {
@@ -135,7 +153,8 @@ export default class ABCChorale {
             }
 
             if (note.pitch != null) {
-                const selectedNotes = this.selectAltoAndTenorNotes(note);
+                const selectedNotes = this.selectAltoAndTenorNotes(note, previousNote);
+                previousNote = selectedNotes;
                 const altoNote = selectedNotes.alto;
                 const tenorNote = selectedNotes.tenor;
                 altoLineString += " " + altoNote;
@@ -167,13 +186,21 @@ export default class ABCChorale {
     }
 
 
-    selectAltoAndTenorNotes(note) {
+    selectAltoAndTenorNotes(note, previousNote) {
+
+
+        if (previousNote) {
+            console.log(previousNote);
+        } 
+
         const sopranoNote = note.pitch.step;
         const bassnote = this.getBassNote(note.chord).replaceAll(",", "");
         const formattedChord = this.chorale.separateInversion(note.chord);
         const notesNotYetUsed = this.chorale.getTriadFromNumeral(formattedChord.numeral).filter(
             (val) => val != sopranoNote && val != bassnote
         );
+
+
 
         if (notesNotYetUsed.length == 2) {
             return {
