@@ -10,22 +10,27 @@
       <h1>Bach Harmony Generator</h1>
       <div class="">
         <br><br>
+        <p class="">
+          <button @click="previousStep" class="btn btn-secondary">Back a Step</button> |
+          <button @click="nextStep" class="btn btn-primary text-white">Next Step</button> |
+          <button @click="loadDifferentMelody" class="btn btn-info">Load a Different Melody</button>
+        </p>
         <div id="target"></div>
         <div id="audio" class=""></div>
         <div class="bg-light border rounded my-3 p-5 text-start">
           <p><strong>{{ steps[currentStep].title }}</strong></p>
           <ReadMore :steps="steps" :currentStep="currentStep" :key="componentKey"/>
-          <p  v-if="currentStep == 4">
-            <button class="btn btn-info" @click="toggleChordDiagram">Chord Progression Flow Chart</button> | 
-            <button class="btn btn-info" @click="toggleChordTable">Chord Table</button>
-          </p>
-          <button class="btn btn-danger" v-if="currentStep == 7" @click="backToStart">Back To Start</button>
+          <div class="text-center">
+            <p  v-if="currentStep == 3">
+              <button class="btn btn-info" @click="toggleChordTable">Chord Table</button>
+            </p>
+            <p  v-if="currentStep == 4">
+              <button class="btn btn-info" @click="toggleChordDiagram">Chord Progression Flow Chart</button> | 
+              <button class="btn btn-info" @click="toggleChordTable">Chord Table</button>
+            </p>
+            <button class="btn btn-danger" v-if="currentStep == 7" @click="backToStart">Back To Start</button>
+          </div>
         </div>
-        <p class="text-start">
-          <button @click="previousStep" class="btn btn-secondary">Back a Step</button> |
-          <button @click="nextStep" class="btn btn-primary text-white">Next Step</button> |
-          <button @click="loadDifferentMelody" class="btn btn-info">Load a Different Melody</button>
-        </p>
       </div>
       
     </div>
