@@ -1,5 +1,4 @@
 import jsHelpers from "@/jsHelpers";
-import { Chord, Key } from "tonal";
 
 export default class ABCChorale {
     constructor(abcString, chorale) {
@@ -131,6 +130,24 @@ export default class ABCChorale {
         return note;
     }
 
+    splitABCNote(abcNote){
+        return (abcNote.split(""))
+    }
+
+    // maybe this should be get notes which are strong steps e.g .1 
+    getNeighbours(note){
+        var notesToReturn = new Array();
+        const index = this.abcNotes.indexOf(note);
+        if (index != -1) {
+            if (index != 0) {
+                notesToReturn.push(index - 1);
+            } 
+            if (index != this.abcNotes.length -1 ){
+                notesToReturn.push(index + 1);
+            }
+        }
+        return notesToReturn;
+    }
 
     writeAltoAndTenorParts() {
         this.addAltoAndTenorParts();
@@ -140,6 +157,7 @@ export default class ABCChorale {
         var numOfBars = 0;
         var previousNote = null;
 
+        
         for (const note of this.noteList) {
             if (currentBar < note.barNumber) {
                 altoLineString += " |";
@@ -189,18 +207,62 @@ export default class ABCChorale {
     selectAltoAndTenorNotes(note, previousNote) {
 
 
-        if (previousNote) {
-            console.log(previousNote);
-        } 
-
+        
         const sopranoNote = note.pitch.step;
         const bassnote = this.getBassNote(note.chord).replaceAll(",", "");
         const formattedChord = this.chorale.separateInversion(note.chord);
-        const notesNotYetUsed = this.chorale.getTriadFromNumeral(formattedChord.numeral).filter(
+        const chordNotes = this.chorale.getTriadFromNumeral(formattedChord.numeral);
+        const notesNotYetUsed = chordNotes.filter(
             (val) => val != sopranoNote && val != bassnote
-        );
+        ).map(this.removeSharpOrFlat);
+
+        var selectedAltoNote = null;
+        var selectedTenorNote = null;
+
+        if (previousNote) {
+            const previousAltoNoteNeighbours = this.getNeighbours(previousNote.alto);
+            const previousTenorNoteNeighbours = this.getNeighbours(previousNote.tenor);
+
+            console.log(previousAltoNoteNeighbours)
+            console.log(previousTenorNoteNeighbours)
+
+            if (notesNotYetUsed.length == 2){
 
 
+
+                // TODO we have the problem here of we need to pick an octave but also choose the note regardless of octave
+                // if the previous alto note is in step with either of the left over notes from the chord
+                // this.splitABCNote(previousNote.alto)
+
+
+                if (previousAltoNoteNeighbours.includes(notesNotYetUsed[0]) || previousTenorNoteNeighbours.includes(notesNotYetUsed[1])) {
+                    selectedAltoNote = notesNotYetUsed[0];
+                    selectedTenorNote = notesNotYetUsed[1]; 
+                } else if (previousAltoNoteNeighbours.includes(notesNotYetUsed[1] || previousTenorNoteNeighbours.includes(notesNotYetUsed[0]))){
+                    selectedAltoNote = notesNotYetUsed[1];
+                    selectedTenorNote = notesNotYetUsed[0]; 
+                } 
+            } else if (notesNotYetUsed.length == 1){
+                if (previousAltoNoteNeighbours.includes(notesNotYetUsed[0])) {
+                    selectedAltoNote = notesNotYetUsed[0];
+                } 
+
+                if (previousTenorNoteNeighbours.includes(notesNotYetUsed[0])) {
+                    selectedTenorNote = notesNotYetUsed[0];
+                }
+
+                if (selectedAltoNote != null) {
+                    // check if any other notes in the chord would be in step and choose them
+                    console.log(chordNotes);
+
+
+                }
+            
+            } else {
+                throw new Error ("There should be 1 or 2 notes not yet used until ii7b is added");
+            }
+        } 
+        
 
         if (notesNotYetUsed.length == 2) {
             return {
