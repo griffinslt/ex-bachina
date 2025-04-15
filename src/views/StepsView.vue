@@ -50,9 +50,10 @@ export default {
         }
 
         const handleSubmit = () => {
+            console.log(definition.value);
             steps.value.push({
                 title: term.value,
-                content: [definition.value]
+                content: definition.value.split(/\n/)
             });
             toggleAddNewFlashCard();
         }
