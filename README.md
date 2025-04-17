@@ -1,6 +1,8 @@
 # ex-bachina
 
-This template should help get you started developing with Vue 3 in Vite.
+This is the codebase for my 4th Year MSci Project. It is a teaching tool to help computer scientists learn how to build harmonies in the style of Bach.
+
+You can check out the current live version at [griffinslt.github.io/ex-bachina/](https://griffinslt.github.io/ex-bachina/)
 
 ## Recommended IDE Setup
 
